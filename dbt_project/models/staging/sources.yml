@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: RAW
+    description: Raw tables migrated from the source Postgres (Neon) database
+    tables:
+      - name: raw_subscription_events
+        description: One row per revenue event per customer per month
+        columns:
+          - name: event_id
+            tests: [unique, not_null]
+          - name: customer_id
+            tests: [not_null]
+          - name: event_type
+            tests:
+              - accepted_values:
+                  values: ['new', 'expansion', 'contraction', 'churn', 'reactivation']
+          - name: mrr_amount
+            tests: [not_null]
+
+      - name: raw_customers
+        description: One row per customer
+        columns:
+          - name: customer_id
+            tests: [unique, not_null]
+          - name: segment
+            tests:
+              - accepted_values:
+                  values: ['smb', 'mid_market', 'enterprise']
+
+      - name: raw_usage_signals
+        description: Monthly product usage signals per customer
+        columns:
+          - name: signal_id
+            tests: [unique, not_null]
+          - name: customer_id
+            tests: [not_null]

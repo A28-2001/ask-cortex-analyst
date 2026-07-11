@@ -1,0 +1,156 @@
+version: 2
+
+models:
+  - name: mrr_movements
+    description: >
+      Monthly MRR broken into waterfall components — new, expansion, contraction,
+      churn, and reactivation. One row per month. Powers the MRR waterfall chart
+      and NRR trend line in Tableau.
+    columns:
+      - name: month
+        description: First day of the calendar month (date).
+        tests: [unique, not_null]
+      - name: starting_mrr
+        description: Ending MRR from the prior month (0 for the first month).
+        tests: [not_null]
+      - name: new_mrr
+        description: MRR from customers signing up for the first time this month.
+        tests: [not_null]
+      - name: expansion_mrr
+        description: MRR gained from existing customers upgrading or expanding.
+        tests: [not_null]
+      - name: contraction_mrr
+        description: MRR lost from existing customers downgrading (positive value).
+        tests: [not_null]
+      - name: churn_mrr
+        description: MRR lost from customers who cancelled this month (positive value).
+        tests: [not_null]
+      - name: reactivation_mrr
+        description: MRR from previously churned customers who reactivated.
+        tests: [not_null]
+      - name: net_new_mrr
+        description: Net MRR change = new + expansion + reactivation - contraction - churn.
+        tests: [not_null]
+      - name: ending_mrr
+        description: Cumulative ending MRR for this month.
+        tests: [not_null]
+      - name: new_customers
+        description: Count of new customers acquired this month.
+      - name: churned_customers
+        description: Count of customers who churned this month.
+      - name: net_revenue_retention_pct
+        description: >
+          NRR = (starting MRR + expansion + reactivation - contraction - churn)
+          / starting MRR × 100. NULL for the first month.
+
+  - name: cohort_retention
+    description: >
+      Month-over-month retention rates per customer acquisition cohort.
+      Each row is a cohort × active_month pair. Powers the retention heatmap.
+    columns:
+      - name: cohort_month
+        description: The month customers in this cohort first signed up.
+        tests: [not_null]
+      - name: active_month
+        description: The calendar month being measured.
+        tests: [not_null]
+      - name: months_since_cohort
+        description: Number of months elapsed since cohort acquisition (0 = first month).
+        tests: [not_null]
+      - name: cohort_size
+        description: Total customers in this cohort at acquisition.
+        tests: [not_null]
+      - name: active_customers
+        description: Number of cohort customers still active in active_month.
+        tests: [not_null]
+      - name: retention_rate_pct
+        description: active_customers / cohort_size × 100. 100% at months_since_cohort = 0.
+        tests: [not_null]
+
+  - name: customer_health_scores
+    description: >
+      Composite health score (0-100) per active customer, built from usage signals
+      and revenue trends. Powers the customer health scorecard in Tableau.
+      Churned customers are excluded.
+    columns:
+      - name: customer_id
+        description: Unique customer identifier.
+        tests: [unique, not_null]
+      - name: company_name
+        description: Fictional company name.
+        tests: [not_null]
+      - name: segment
+        description: Customer segment — smb, mid_market, or enterprise.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['smb', 'mid_market', 'enterprise']
+      - name: cohort_month
+        description: Month the customer was first acquired.
+      - name: engagement_score
+        description: 0-100 score based on feature adoption rate (last 3 months avg).
+      - name: recency_score
+        description: 0-100 score based on days since last login. Higher = more active.
+      - name: support_score
+        description: 0-100 score based on support ticket volume. Higher = fewer tickets.
+      - name: nps_score_normalized
+        description: NPS (0-10) normalised to 0-100 scale.
+      - name: revenue_health_score
+        description: 0-100 score penalising net contraction relative to expansion.
+      - name: composite_health_score
+        description: >
+          Weighted composite: engagement 25%, recency 25%, support 15%,
+          NPS 15%, revenue health 20%.
+        tests: [not_null]
+      - name: health_status
+        description: Categorical label — healthy (≥75), at_risk (≥65), critical (<65).
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['healthy', 'at_risk', 'critical']
+      - name: current_mrr
+        description: Most recent MRR value for this customer.
+      - name: expansion_mrr
+        description: Total expansion MRR in the last 6 months.
+      - name: contraction_mrr
+        description: Total contraction MRR in the last 6 months.
+
+  - name: anomaly_flags
+    description: >
+      Monthly anomaly detection results. For each month, calculates a 6-month
+      rolling average and standard deviation per MRR metric. Months where a
+      metric exceeds 2σ from the rolling average are flagged.
+      Powers the anomaly alert panel in Tableau.
+    columns:
+      - name: month
+        description: Calendar month of the measurement.
+        tests: [unique, not_null]
+      - name: net_mrr_z_score
+        description: Z-score of net_new_mrr vs its 6-month rolling average.
+      - name: churn_z_score
+        description: Z-score of churn_mrr vs its 6-month rolling average.
+      - name: expansion_z_score
+        description: Z-score of expansion_mrr vs its 6-month rolling average.
+      - name: new_mrr_z_score
+        description: Z-score of new_mrr vs its 6-month rolling average.
+      - name: contraction_z_score
+        description: Z-score of contraction_mrr vs its 6-month rolling average.
+      - name: net_mrr_anomaly
+        description: TRUE if net_new_mrr deviates more than 2σ from rolling average.
+      - name: churn_anomaly
+        description: TRUE if churn_mrr deviates more than 2σ from rolling average.
+      - name: expansion_anomaly
+        description: TRUE if expansion_mrr deviates more than 2σ from rolling average.
+      - name: new_mrr_anomaly
+        description: TRUE if new_mrr deviates more than 2σ from rolling average.
+      - name: contraction_anomaly
+        description: TRUE if contraction_mrr deviates more than 2σ from rolling average.
+      - name: total_anomalies
+        description: Count of metrics flagged this month (0–5).
+        tests: [not_null]
+      - name: anomaly_status
+        description: flagged if any metric exceeded threshold, normal otherwise.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['flagged', 'normal']
