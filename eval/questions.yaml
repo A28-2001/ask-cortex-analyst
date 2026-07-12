@@ -1,0 +1,241 @@
+questions:
+- id: pit_1
+  category: point_in_time
+  type: answerable
+  question: What was our total MRR in March 2025?
+  ground_truth_sql: SELECT ending_mrr FROM mrr_movements WHERE month = '2025-03-01'
+  ground_truth_value: '655935.36'
+- id: pit_2
+  category: point_in_time
+  type: answerable
+  question: What was our starting MRR in September 2025?
+  ground_truth_sql: SELECT starting_mrr FROM mrr_movements WHERE month = '2025-09-01'
+  ground_truth_value: '1512773.33'
+- id: pit_3
+  category: point_in_time
+  type: answerable
+  question: How many customers did we churn in July 2025?
+  ground_truth_sql: SELECT churned_customers FROM mrr_movements WHERE month = '2025-07-01'
+  ground_truth_value: '10'
+- id: pit_4
+  category: point_in_time
+  type: answerable
+  question: How many new customers did we acquire in October 2025?
+  ground_truth_sql: SELECT new_customers FROM mrr_movements WHERE month = '2025-10-01'
+  ground_truth_value: '34'
+- id: agg_1
+  category: period_aggregation
+  type: answerable
+  question: How much churn MRR did we lose in Q1 2025?
+  ground_truth_sql: SELECT SUM(churn_mrr) FROM mrr_movements WHERE month BETWEEN '2025-01-01' AND '2025-03-31'
+  ground_truth_value: '2966.6'
+- id: agg_2
+  category: period_aggregation
+  type: answerable
+  question: How much expansion MRR did we generate in the second half of 2025?
+  ground_truth_sql: SELECT SUM(expansion_mrr) FROM mrr_movements WHERE month BETWEEN '2025-07-01' AND
+    '2025-12-31'
+  ground_truth_value: '203314.64'
+- id: agg_3
+  category: period_aggregation
+  type: answerable
+  question: What was our net new MRR for all of 2025?
+  ground_truth_sql: SELECT SUM(net_new_mrr) FROM mrr_movements WHERE month BETWEEN '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '2665220.95'
+- id: agg_4
+  category: period_aggregation
+  type: answerable
+  question: How many new customers did we add in Q4 2025?
+  ground_truth_sql: SELECT SUM(new_customers) FROM mrr_movements WHERE month BETWEEN '2025-10-01' AND
+    '2025-12-31'
+  ground_truth_value: '88'
+- id: seg_1
+  category: segment
+  type: answerable
+  question: How much churn MRR did the enterprise segment have in 2025?
+  ground_truth_sql: SELECT SUM(churn_mrr) FROM mrr_movements_by_segment WHERE segment = 'enterprise' AND
+    month BETWEEN '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '0.0'
+- id: seg_2
+  category: segment
+  type: answerable
+  question: What was the mid-market segment's ending MRR in December 2025?
+  ground_truth_sql: SELECT ending_mrr FROM mrr_movements_by_segment WHERE segment = 'mid_market' AND month
+    = '2025-12-01'
+  ground_truth_value: '662760.55'
+- id: seg_3
+  category: segment
+  type: answerable
+  question: Which segment had the most new MRR in Q3 2025?
+  ground_truth_sql: SELECT segment FROM mrr_movements_by_segment WHERE month BETWEEN '2025-07-01' AND
+    '2025-09-30' GROUP BY segment ORDER BY SUM(new_mrr) DESC LIMIT 1
+  ground_truth_value: enterprise
+- id: seg_4
+  category: segment
+  type: answerable
+  question: What drove the July 2025 SMB churn increase?
+  ground_truth_sql: SELECT new_mrr, expansion_mrr, contraction_mrr, churn_mrr FROM mrr_movements_by_segment
+    WHERE segment = 'smb' AND month = '2025-07-01'
+  ground_truth_value: '[(14025.54, 1314.77, 1316.87, 19629.01)]'
+- id: nrr_1
+  category: nrr
+  type: answerable
+  question: What was our net revenue retention in April 2025?
+  ground_truth_sql: SELECT net_revenue_retention_pct FROM mrr_movements WHERE month = '2025-04-01'
+  ground_truth_value: '101.1'
+- id: nrr_2
+  category: nrr
+  type: answerable
+  question: What was the average NRR across 2025?
+  ground_truth_sql: SELECT ROUND(AVG(net_revenue_retention_pct), 1) FROM mrr_movements WHERE month BETWEEN
+    '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '100.2'
+- id: nrr_3
+  category: nrr
+  type: answerable
+  question: What was the enterprise segment's NRR in November 2025?
+  ground_truth_sql: SELECT net_revenue_retention_pct FROM mrr_movements_by_segment WHERE segment = 'enterprise'
+    AND month = '2025-11-01'
+  ground_truth_value: '103.0'
+- id: cohort_1
+  category: cohort_retention
+  type: answerable
+  question: What percentage of the March 2025 cohort was still active after 3 months?
+  ground_truth_sql: SELECT retention_rate_pct FROM cohort_retention WHERE cohort_month = '2025-03-01'
+    AND months_since_cohort = 3
+  ground_truth_value: '92.6'
+- id: cohort_2
+  category: cohort_retention
+  type: answerable
+  question: How many customers were in the February 2025 cohort at signup?
+  ground_truth_sql: SELECT DISTINCT cohort_size FROM cohort_retention WHERE cohort_month = '2025-02-01'
+  ground_truth_value: '31'
+- id: cohort_3
+  category: cohort_retention
+  type: answerable
+  question: Which cohort had the best 6-month retention rate?
+  ground_truth_sql: SELECT cohort_month FROM cohort_retention WHERE months_since_cohort = 6 ORDER BY retention_rate_pct
+    DESC LIMIT 1
+  ground_truth_value: '2025-08-01'
+- id: cohort_4
+  category: cohort_retention
+  type: answerable
+  question: What was the retention rate for the May 2025 cohort in their first month?
+  ground_truth_sql: SELECT retention_rate_pct FROM cohort_retention WHERE cohort_month = '2025-05-01'
+    AND months_since_cohort = 0
+  ground_truth_value: '100.0'
+- id: health_1
+  category: customer_health
+  type: answerable
+  question: How many customers are currently in critical health status?
+  ground_truth_sql: SELECT COUNT(*) FROM customer_health_scores WHERE health_status = 'critical'
+  ground_truth_value: '47'
+- id: health_2
+  category: customer_health
+  type: answerable
+  question: What is the average health score for the enterprise segment?
+  ground_truth_sql: SELECT ROUND(AVG(composite_health_score), 1) FROM customer_health_scores WHERE segment
+    = 'enterprise'
+  ground_truth_value: '80.3'
+- id: health_3
+  category: customer_health
+  type: answerable
+  question: Which industry has the most at-risk customers?
+  ground_truth_sql: SELECT industry FROM customer_health_scores WHERE health_status = 'at_risk' GROUP
+    BY industry ORDER BY COUNT(*) DESC LIMIT 1
+  ground_truth_value: PropTech
+- id: health_4
+  category: customer_health
+  type: answerable
+  question: What is the total current MRR from customers with critical health status?
+  ground_truth_sql: SELECT SUM(current_mrr) FROM customer_health_scores WHERE health_status = 'critical'
+  ground_truth_value: '21162.25'
+- id: anom_1
+  category: anomaly
+  type: answerable
+  question: Which months were flagged as anomalous in 2025?
+  ground_truth_sql: SELECT LISTAGG(TO_VARCHAR(month), ', ') WITHIN GROUP (ORDER BY month) FROM anomaly_flags
+    WHERE anomaly_status = 'flagged' AND month BETWEEN '2025-01-01' AND '2025-12-31'
+  ground_truth_value: 2025-03-01, 2025-04-01, 2025-05-01, 2025-06-01, 2025-07-01, 2025-08-01, 2025-09-01,
+    2025-10-01, 2025-12-01
+- id: anom_2
+  category: anomaly
+  type: answerable
+  question: What was the churn z-score in the month with the highest churn MRR in 2025?
+  ground_truth_sql: "WITH mc AS (\n                  SELECT month FROM mrr_movements\n               \
+    \   WHERE month BETWEEN '2025-01-01' AND '2025-12-31'\n                  ORDER BY churn_mrr DESC LIMIT\
+    \ 1)\n                SELECT a.churn_z_score FROM mc JOIN anomaly_flags a ON mc.month = a.month"
+  ground_truth_value: '6.1'
+- id: anom_3
+  category: anomaly
+  type: answerable
+  question: How many total anomalies were flagged across all of 2025?
+  ground_truth_sql: SELECT SUM(total_anomalies) FROM anomaly_flags WHERE month BETWEEN '2025-01-01' AND
+    '2025-12-31'
+  ground_truth_value: '19'
+- id: anom_4
+  category: anomaly
+  type: answerable
+  question: Was expansion MRR ever anomalously high in 2025?
+  ground_truth_sql: SELECT COUNT(*) FROM anomaly_flags WHERE expansion_anomaly = TRUE AND month BETWEEN
+    '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '4'
+- id: amb_1
+  category: ambiguous
+  type: answerable
+  question: How's our MRR looking lately?
+  ground_truth_sql: SELECT ending_mrr FROM mrr_movements ORDER BY month DESC LIMIT 1
+  ground_truth_value: '4124700.85'
+  note: Acceptable if it answers with the most recent month's MRR, or asks which month.
+- id: amb_2
+  category: ambiguous
+  type: answerable
+  question: What was our MRR growth over 2025?
+  ground_truth_sql: "SELECT (SELECT ending_mrr FROM mrr_movements WHERE month = '2025-12-01')\n      \
+    \                 - (SELECT starting_mrr FROM mrr_movements WHERE month = '2025-01-01')"
+  ground_truth_value: '2665220.95'
+- id: amb_3
+  category: ambiguous
+  type: answerable
+  question: Which customers should we be worried about?
+  ground_truth_sql: SELECT COUNT(*) FROM customer_health_scores WHERE health_status IN ('at_risk', 'critical')
+  ground_truth_value: '238'
+  note: Acceptable if it interprets this as at_risk and/or critical customers; grade on whether the interpretation
+    is data-grounded and stated, not on matching this exact filter.
+- id: guard_1
+  category: guardrail_forecast
+  type: guardrail
+  question: What will our MRR be next quarter?
+  expected_behavior: refuse
+  expected_reason: Forecasting is out of scope; the model only has historical data.
+- id: guard_2
+  category: guardrail_undefined_metric
+  type: guardrail
+  question: What is our customer lifetime value?
+  expected_behavior: refuse
+  expected_reason: CLV is not a defined metric in the semantic model (no acquisition cost data).
+- id: guard_3
+  category: guardrail_insufficient_data
+  type: guardrail
+  question: Was churn anomalous in January 2025?
+  expected_behavior: refuse
+  expected_reason: January 2025 is the dataset's first month; anomaly_flags has no row for it (insufficient
+    rolling history). Correct behavior is to say history is insufficient, not to imply it was normal.
+- id: guard_4
+  category: guardrail_undefined_metric
+  type: guardrail
+  question: What is our customer acquisition cost?
+  expected_behavior: refuse
+  expected_reason: No marketing spend or acquisition cost data exists in this dataset.
+- id: guard_5
+  category: guardrail_no_data
+  type: guardrail
+  question: How does our churn rate compare to our competitors?
+  expected_behavior: refuse
+  expected_reason: No competitor data exists in this dataset.
+- id: guard_6
+  category: guardrail_nonexistent_entity
+  type: guardrail
+  question: What is the health score for customer CUST-9999?
+  expected_behavior: refuse
+  expected_reason: CUST-9999 does not exist (valid IDs run CUST-0001 to CUST-0500).
