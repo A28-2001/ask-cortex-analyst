@@ -1,0 +1,510 @@
+name: nl_assistant_semantic_model
+description: >
+  Semantic model over a SaaS subscription analytics dataset (500 customers,
+  18 months). Covers MRR movements (company-wide and by segment), cohort
+  retention, customer health scoring, and MRR anomaly detection.
+
+tables:
+  - name: mrr_movements
+    description: >
+      Monthly MRR broken into waterfall components, company-wide (not
+      segmented). One row per month. starting_mrr and ending_mrr are
+      point-in-time balances (a "stock") — never sum them across months.
+      new_mrr, expansion_mrr, contraction_mrr, churn_mrr, reactivation_mrr,
+      and net_new_mrr are period flows — safe to sum across a date range.
+    base_table:
+      database: NL_ASSISTANT_DB
+      schema: ANALYTICS
+      table: MRR_MOVEMENTS
+    primary_key:
+      columns: [MONTH]
+    time_dimensions:
+      - name: month
+        expr: MONTH
+        data_type: DATE
+        synonyms: ["calendar month", "period"]
+        description: First day of the calendar month.
+    facts:
+      - name: starting_mrr
+        expr: STARTING_MRR
+        data_type: NUMBER
+        description: >
+          Point-in-time MRR balance at the start of this month, company-wide.
+          A snapshot, not a flow — do not sum across months. Select the value
+          for a specific month, or use it to compute a period's own NRR.
+      - name: ending_mrr
+        expr: ENDING_MRR
+        data_type: NUMBER
+        synonyms: ["total MRR", "current MRR", "MRR"]
+        description: >
+          Point-in-time cumulative MRR balance at the end of this month,
+          company-wide. A snapshot, not a flow — do not sum across months.
+          To answer "what was MRR in month X", select ending_mrr for that
+          single month.
+      - name: new_mrr
+        expr: NEW_MRR
+        data_type: NUMBER
+        description: MRR added this month from brand-new customers. A flow — safe to sum across a date range.
+      - name: expansion_mrr
+        expr: EXPANSION_MRR
+        data_type: NUMBER
+        description: MRR gained this month from existing customers upgrading. A flow — safe to sum across a date range.
+      - name: contraction_mrr
+        expr: CONTRACTION_MRR
+        data_type: NUMBER
+        description: MRR lost this month from existing customers downgrading (positive value). A flow — safe to sum across a date range.
+      - name: churn_mrr
+        expr: CHURN_MRR
+        data_type: NUMBER
+        description: MRR lost this month from cancelled customers (positive value). A flow — safe to sum across a date range.
+      - name: reactivation_mrr
+        expr: REACTIVATION_MRR
+        data_type: NUMBER
+        description: MRR from previously churned customers reactivating this month. A flow — safe to sum across a date range.
+      - name: net_new_mrr
+        expr: NET_NEW_MRR
+        data_type: NUMBER
+        description: Net MRR change this month (new + expansion + reactivation - contraction - churn). A flow — safe to sum across a date range.
+      - name: new_customers
+        expr: NEW_CUSTOMERS
+        data_type: NUMBER
+        description: Count of new customers acquired this month.
+      - name: churned_customers
+        expr: CHURNED_CUSTOMERS
+        data_type: NUMBER
+        description: Count of customers who churned this month.
+      - name: net_revenue_retention_pct
+        expr: NET_REVENUE_RETENTION_PCT
+        data_type: NUMBER
+        synonyms: ["NRR"]
+        description: >
+          Net revenue retention for this month as a percentage. A ratio,
+          not a flow or stock — do not sum across months. If asked for NRR
+          "over" a range, average it or compute for the specific month
+          asked about, and say which you did.
+    metrics:
+      - name: total_new_mrr
+        expr: SUM(new_mrr)
+        description: Total new MRR added across the selected period.
+      - name: total_expansion_mrr
+        expr: SUM(expansion_mrr)
+        description: Total expansion MRR across the selected period.
+      - name: total_contraction_mrr
+        expr: SUM(contraction_mrr)
+        description: Total contraction MRR across the selected period.
+      - name: total_churn_mrr
+        expr: SUM(churn_mrr)
+        description: Total churned MRR across the selected period.
+      - name: total_reactivation_mrr
+        expr: SUM(reactivation_mrr)
+        description: Total reactivation MRR across the selected period.
+      - name: total_net_new_mrr
+        expr: SUM(net_new_mrr)
+        description: Total net new MRR across the selected period.
+      - name: avg_net_revenue_retention_pct
+        expr: AVG(net_revenue_retention_pct)
+        description: Average of the monthly NRR percentage across the selected period.
+
+  - name: mrr_movements_by_segment
+    description: >
+      Same waterfall logic as mrr_movements, broken out per customer
+      segment (smb, mid_market, enterprise). One row per month x segment.
+      Use this table (not mrr_movements) for any segment-specific revenue
+      question. starting_mrr and ending_mrr are point-in-time balances per
+      segment — never sum them across months.
+    base_table:
+      database: NL_ASSISTANT_DB
+      schema: ANALYTICS
+      table: MRR_MOVEMENTS_BY_SEGMENT
+    primary_key:
+      columns: [MONTH, SEGMENT]
+    time_dimensions:
+      - name: month
+        expr: MONTH
+        data_type: DATE
+        description: First day of the calendar month.
+    dimensions:
+      - name: segment
+        expr: SEGMENT
+        data_type: VARCHAR
+        is_enum: true
+        sample_values: ["smb", "mid_market", "enterprise"]
+        description: Customer segment.
+    facts:
+      - name: starting_mrr
+        expr: STARTING_MRR
+        data_type: NUMBER
+        description: Point-in-time MRR balance at the start of this month, for this segment. Do not sum across months.
+      - name: ending_mrr
+        expr: ENDING_MRR
+        data_type: NUMBER
+        description: Point-in-time cumulative MRR balance at the end of this month, for this segment. Do not sum across months.
+      - name: new_mrr
+        expr: NEW_MRR
+        data_type: NUMBER
+        description: MRR added this month from new customers in this segment. A flow — safe to sum.
+      - name: expansion_mrr
+        expr: EXPANSION_MRR
+        data_type: NUMBER
+        description: Expansion MRR this month for this segment. A flow — safe to sum.
+      - name: contraction_mrr
+        expr: CONTRACTION_MRR
+        data_type: NUMBER
+        description: Contraction MRR this month for this segment (positive value). A flow — safe to sum.
+      - name: churn_mrr
+        expr: CHURN_MRR
+        data_type: NUMBER
+        description: Churned MRR this month for this segment (positive value). A flow — safe to sum.
+      - name: reactivation_mrr
+        expr: REACTIVATION_MRR
+        data_type: NUMBER
+        description: Reactivation MRR this month for this segment. A flow — safe to sum.
+      - name: net_new_mrr
+        expr: NET_NEW_MRR
+        data_type: NUMBER
+        description: Net MRR change this month for this segment. A flow — safe to sum.
+      - name: new_customers
+        expr: NEW_CUSTOMERS
+        data_type: NUMBER
+        description: New customers acquired this month in this segment.
+      - name: churned_customers
+        expr: CHURNED_CUSTOMERS
+        data_type: NUMBER
+        description: Customers churned this month in this segment.
+      - name: net_revenue_retention_pct
+        expr: NET_REVENUE_RETENTION_PCT
+        data_type: NUMBER
+        description: NRR for this segment this month, as a percentage. A ratio — do not sum across months.
+    metrics:
+      - name: total_new_mrr_by_segment
+        expr: SUM(new_mrr)
+        description: Total new MRR for this segment across the selected period.
+      - name: total_churn_mrr_by_segment
+        expr: SUM(churn_mrr)
+        description: Total churned MRR for this segment across the selected period.
+      - name: total_expansion_mrr_by_segment
+        expr: SUM(expansion_mrr)
+        description: Total expansion MRR for this segment across the selected period.
+      - name: total_contraction_mrr_by_segment
+        expr: SUM(contraction_mrr)
+        description: Total contraction MRR for this segment across the selected period.
+
+  - name: cohort_retention
+    description: >
+      Month-over-month retention rates per customer acquisition cohort.
+      Each row is a cohort_month x active_month pair.
+    base_table:
+      database: NL_ASSISTANT_DB
+      schema: ANALYTICS
+      table: COHORT_RETENTION
+    primary_key:
+      columns: [COHORT_MONTH, ACTIVE_MONTH]
+    time_dimensions:
+      - name: cohort_month
+        expr: COHORT_MONTH
+        data_type: DATE
+        description: The month customers in this cohort first signed up.
+      - name: active_month
+        expr: ACTIVE_MONTH
+        data_type: DATE
+        description: The calendar month being measured for retention.
+    dimensions:
+      - name: months_since_cohort
+        expr: MONTHS_SINCE_COHORT
+        data_type: NUMBER
+        description: Number of months elapsed since cohort acquisition (0 = the cohort's first month).
+    facts:
+      - name: cohort_size
+        expr: COHORT_SIZE
+        data_type: NUMBER
+        description: Total customers in this cohort at acquisition.
+      - name: active_customers
+        expr: ACTIVE_CUSTOMERS
+        data_type: NUMBER
+        description: Number of cohort customers still active in active_month.
+      - name: retention_rate_pct
+        expr: RETENTION_RATE_PCT
+        data_type: NUMBER
+        description: >
+          active_customers / cohort_size x 100 for this cohort at this
+          active_month. A ratio — do not sum across rows; average only
+          when explicitly asked for an average retention rate.
+    metrics:
+      - name: avg_retention_rate_pct
+        expr: AVG(retention_rate_pct)
+        description: Average retention rate across the selected cohorts/months.
+
+  - name: customer_health_scores
+    description: >
+      Composite health score (0-100) per active customer, built from usage
+      signals and revenue trends. Churned customers are excluded from this
+      table entirely — it only contains customers currently active.
+    base_table:
+      database: NL_ASSISTANT_DB
+      schema: ANALYTICS
+      table: CUSTOMER_HEALTH_SCORES
+    primary_key:
+      columns: [CUSTOMER_ID]
+    dimensions:
+      - name: customer_id
+        expr: CUSTOMER_ID
+        data_type: VARCHAR
+        unique: true
+        description: Unique customer identifier.
+      - name: company_name
+        expr: COMPANY_NAME
+        data_type: VARCHAR
+        description: Customer's company name.
+      - name: segment
+        expr: SEGMENT
+        data_type: VARCHAR
+        is_enum: true
+        sample_values: ["smb", "mid_market", "enterprise"]
+        description: Customer segment.
+      - name: industry
+        expr: INDUSTRY
+        data_type: VARCHAR
+        description: Customer's industry.
+      - name: sales_rep
+        expr: SALES_REP
+        data_type: VARCHAR
+        description: Assigned sales representative.
+      - name: health_status
+        expr: HEALTH_STATUS
+        data_type: VARCHAR
+        is_enum: true
+        sample_values: ["healthy", "at_risk", "critical"]
+        description: healthy (score >= 75), at_risk (score >= 65), critical (score < 65).
+    time_dimensions:
+      - name: cohort_month
+        expr: COHORT_MONTH
+        data_type: DATE
+        description: Month this customer was first acquired.
+    facts:
+      - name: engagement_score
+        expr: ENGAGEMENT_SCORE
+        data_type: NUMBER
+        description: 0-100 score based on feature adoption rate (last 3 months avg). 25% weight in composite score.
+      - name: recency_score
+        expr: RECENCY_SCORE
+        data_type: NUMBER
+        description: 0-100 score based on days since last login, higher = more active. 25% weight in composite score.
+      - name: support_score
+        expr: SUPPORT_SCORE
+        data_type: NUMBER
+        description: 0-100 score based on support ticket volume, higher = fewer tickets. 15% weight in composite score.
+      - name: nps_score_normalized
+        expr: NPS_SCORE_NORMALIZED
+        data_type: NUMBER
+        description: NPS (0-10) normalized to a 0-100 scale. 15% weight in composite score.
+      - name: revenue_health_score
+        expr: REVENUE_HEALTH_SCORE
+        data_type: NUMBER
+        description: 0-100 score penalizing net contraction relative to expansion. 20% weight in composite score.
+      - name: composite_health_score
+        expr: COMPOSITE_HEALTH_SCORE
+        data_type: NUMBER
+        synonyms: ["health score"]
+        description: >
+          Weighted composite: engagement 25%, recency 25%, support 15%,
+          NPS 15%, revenue health 20%. This is the headline health metric.
+      - name: current_mrr
+        expr: CURRENT_MRR
+        data_type: NUMBER
+        description: >
+          Most recent MRR value for this customer. Unlike mrr_movements,
+          summing current_mrr across all customers gives a valid total
+          (current total active MRR), since each row is one customer's
+          current snapshot, not a repeated monthly balance.
+      - name: expansion_mrr
+        expr: EXPANSION_MRR
+        data_type: NUMBER
+        description: Total expansion MRR for this customer in the last 6 months.
+      - name: contraction_mrr
+        expr: CONTRACTION_MRR
+        data_type: NUMBER
+        description: Total contraction MRR for this customer in the last 6 months.
+    metrics:
+      - name: avg_composite_health_score
+        expr: AVG(composite_health_score)
+        description: Average health score across the selected customers.
+      - name: customer_count
+        expr: COUNT(customer_id)
+        description: Number of active customers matching the filter.
+      - name: total_current_mrr
+        expr: SUM(current_mrr)
+        description: Total current MRR across the selected active customers.
+
+  - name: anomaly_flags
+    description: >
+      Monthly anomaly detection results, company-wide (not segmented).
+      For each month, a 6-month rolling average and standard deviation is
+      calculated per MRR metric; months exceeding 2 standard deviations
+      are flagged. This table does not distinguish segments — it cannot
+      answer "was the SMB spike anomalous", only whether the company-wide
+      monthly movement was anomalous.
+    base_table:
+      database: NL_ASSISTANT_DB
+      schema: ANALYTICS
+      table: ANOMALY_FLAGS
+    primary_key:
+      columns: [MONTH]
+    time_dimensions:
+      - name: month
+        expr: MONTH
+        data_type: DATE
+        description: Calendar month of the measurement.
+    dimensions:
+      - name: anomaly_status
+        expr: ANOMALY_STATUS
+        data_type: VARCHAR
+        is_enum: true
+        sample_values: ["flagged", "normal"]
+        description: flagged if any metric exceeded the 2-sigma threshold this month, normal otherwise.
+    facts:
+      - name: net_mrr_z_score
+        expr: NET_MRR_Z_SCORE
+        data_type: NUMBER
+        description: Z-score of net_new_mrr vs its 6-month rolling average.
+      - name: churn_z_score
+        expr: CHURN_Z_SCORE
+        data_type: NUMBER
+        description: Z-score of churn_mrr vs its 6-month rolling average.
+      - name: expansion_z_score
+        expr: EXPANSION_Z_SCORE
+        data_type: NUMBER
+        description: Z-score of expansion_mrr vs its 6-month rolling average.
+      - name: new_mrr_z_score
+        expr: NEW_MRR_Z_SCORE
+        data_type: NUMBER
+        description: Z-score of new_mrr vs its 6-month rolling average.
+      - name: contraction_z_score
+        expr: CONTRACTION_Z_SCORE
+        data_type: NUMBER
+        description: Z-score of contraction_mrr vs its 6-month rolling average.
+      - name: net_mrr_anomaly
+        expr: NET_MRR_ANOMALY
+        data_type: BOOLEAN
+        description: TRUE if net_new_mrr deviated more than 2 standard deviations from its rolling average this month.
+      - name: churn_anomaly
+        expr: CHURN_ANOMALY
+        data_type: BOOLEAN
+        description: TRUE if churn_mrr deviated more than 2 standard deviations from its rolling average this month.
+      - name: expansion_anomaly
+        expr: EXPANSION_ANOMALY
+        data_type: BOOLEAN
+        description: TRUE if expansion_mrr deviated more than 2 standard deviations from its rolling average this month.
+      - name: new_mrr_anomaly
+        expr: NEW_MRR_ANOMALY
+        data_type: BOOLEAN
+        description: TRUE if new_mrr deviated more than 2 standard deviations from its rolling average this month.
+      - name: contraction_anomaly
+        expr: CONTRACTION_ANOMALY
+        data_type: BOOLEAN
+        description: TRUE if contraction_mrr deviated more than 2 standard deviations from its rolling average this month.
+      - name: total_anomalies
+        expr: TOTAL_ANOMALIES
+        data_type: NUMBER
+        description: Count of metrics flagged this month (0-5).
+    metrics:
+      - name: months_flagged
+        expr: SUM(CASE WHEN anomaly_status = 'flagged' THEN 1 ELSE 0 END)
+        description: Count of months flagged as anomalous across the selected period.
+
+relationships:
+  - name: mrr_movements_to_anomaly_flags
+    left_table: mrr_movements
+    right_table: anomaly_flags
+    relationship_columns:
+      - left_column: month
+        right_column: month
+
+  - name: customer_health_to_cohort_retention
+    left_table: customer_health_scores
+    right_table: cohort_retention
+    relationship_columns:
+      - left_column: cohort_month
+        right_column: cohort_month
+
+verified_queries:
+  - name: mrr_for_specific_month
+    question: What was our total MRR in June 2026?
+    verified_by: aakash
+    sql: >
+      SELECT ending_mrr FROM mrr_movements WHERE month = '2026-06-01'
+
+  - name: new_mrr_added_in_quarter
+    question: How much new MRR did we add in Q3 2025?
+    verified_by: aakash
+    sql: >
+      SELECT SUM(new_mrr) AS total_new_mrr FROM mrr_movements
+      WHERE month BETWEEN '2025-07-01' AND '2025-09-30'
+
+  - name: nrr_for_specific_month
+    question: What was our net revenue retention in June 2026?
+    verified_by: aakash
+    sql: >
+      SELECT net_revenue_retention_pct FROM mrr_movements WHERE month = '2026-06-01'
+
+  - name: smb_revenue_drivers_q3_2025
+    question: What drove the SMB revenue trend in Q3 2025?
+    verified_by: aakash
+    sql: >
+      SELECT month, new_mrr, expansion_mrr, contraction_mrr, churn_mrr, ending_mrr
+      FROM mrr_movements_by_segment
+      WHERE segment = 'smb' AND month BETWEEN '2025-07-01' AND '2025-09-30'
+      ORDER BY month
+
+  - name: cohort_retention_at_n_months
+    question: What is the retention rate for the January 2025 cohort at 6 months?
+    verified_by: aakash
+    sql: >
+      SELECT retention_rate_pct FROM cohort_retention
+      WHERE cohort_month = '2025-01-01' AND months_since_cohort = 6
+
+  - name: at_risk_customers
+    question: Which customers are at risk?
+    verified_by: aakash
+    sql: >
+      SELECT customer_id, company_name, composite_health_score
+      FROM customer_health_scores
+      WHERE health_status = 'at_risk'
+      ORDER BY composite_health_score ASC
+
+  - name: avg_health_score_by_segment
+    question: What is the average customer health score by segment?
+    verified_by: aakash
+    sql: >
+      SELECT segment, AVG(composite_health_score) AS avg_health_score
+      FROM customer_health_scores
+      GROUP BY segment
+
+  - name: anomalous_months_in_year
+    question: Which months in 2025 had anomalous churn?
+    verified_by: aakash
+    sql: >
+      SELECT month, churn_mrr, churn_z_score
+      FROM anomaly_flags
+      WHERE churn_anomaly = TRUE AND month BETWEEN '2025-01-01' AND '2025-12-31'
+      ORDER BY month
+
+module_custom_instructions:
+  sql_generation: >
+    mrr_movements and anomaly_flags are company-wide; use
+    mrr_movements_by_segment for any question naming a specific segment
+    (smb, mid_market, enterprise). ending_mrr and starting_mrr are
+    point-in-time snapshots, never sum them across months — select the
+    specific month, or the last month in a range, instead. new_mrr,
+    expansion_mrr, contraction_mrr, churn_mrr, reactivation_mrr, and
+    net_new_mrr are period flows and are safe to sum across a date range.
+    anomaly_flags reflects company-wide monthly movements only and has no
+    segment breakdown, so it cannot confirm whether a segment-specific
+    trend was anomalous. If a question asks for a metric, time period, or
+    breakdown that is not defined in this semantic model (for example, a
+    forecast, a metric with no corresponding column, or a segment cut of
+    a company-wide-only table), say plainly that the data or metric is not
+    available rather than approximating or guessing an answer.
+  question_categorization: >
+    Treat questions asking to predict or forecast future values, or asking
+    about entities/metrics with no matching table or column in this model,
+    as out of scope. Do not silently substitute a similar-sounding metric.
