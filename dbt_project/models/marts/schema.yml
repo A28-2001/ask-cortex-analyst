@@ -1,6 +1,57 @@
 version: 2
 
 models:
+  - name: mrr_movements_by_segment
+    description: >
+      Same waterfall logic as mrr_movements, but broken out per customer
+      segment (smb, mid_market, enterprise). One row per month x segment.
+      Built for the NL Data Assistant to answer segment-level revenue
+      questions (e.g. "what drove the Q3 2025 SMB revenue spike") that
+      the company-wide mrr_movements mart cannot answer. starting_mrr and
+      ending_mrr accumulate independently per segment.
+    columns:
+      - name: month
+        description: First day of the calendar month (date).
+        tests: [not_null]
+      - name: segment
+        description: Customer segment — smb, mid_market, or enterprise.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['smb', 'mid_market', 'enterprise']
+      - name: starting_mrr
+        description: Ending MRR from the prior month for this segment (0 for the first month).
+        tests: [not_null]
+      - name: new_mrr
+        description: MRR from customers in this segment signing up for the first time this month.
+        tests: [not_null]
+      - name: expansion_mrr
+        description: MRR gained from existing customers in this segment upgrading or expanding.
+        tests: [not_null]
+      - name: contraction_mrr
+        description: MRR lost from existing customers in this segment downgrading (positive value).
+        tests: [not_null]
+      - name: churn_mrr
+        description: MRR lost from customers in this segment who cancelled this month (positive value).
+        tests: [not_null]
+      - name: reactivation_mrr
+        description: MRR from previously churned customers in this segment who reactivated.
+        tests: [not_null]
+      - name: net_new_mrr
+        description: Net MRR change = new + expansion + reactivation - contraction - churn.
+        tests: [not_null]
+      - name: ending_mrr
+        description: Cumulative ending MRR for this month, within this segment.
+        tests: [not_null]
+      - name: new_customers
+        description: Count of new customers acquired this month in this segment.
+      - name: churned_customers
+        description: Count of customers who churned this month in this segment.
+      - name: net_revenue_retention_pct
+        description: >
+          NRR for this segment = (starting MRR + expansion + reactivation - contraction - churn)
+          / starting MRR × 100. NULL for a segment's first month.
+
   - name: mrr_movements
     description: >
       Monthly MRR broken into waterfall components — new, expansion, contraction,
