@@ -541,7 +541,12 @@ module_custom_instructions:
     the documented valid range). If you are not confident the value
     exists, say so explicitly in your response alongside the SQL, rather
     than presenting the query as if it will return a normal, meaningful
-    result.
+    result. When a question asks for a single summary figure over a
+    period (e.g. "growth", "net change", "how much did X increase by"),
+    compute and state that number explicitly using the SQL itself
+    (e.g. subtract the two relevant point-in-time values, or sum the
+    relevant flow values) rather than only returning the underlying
+    period-by-period rows and leaving the arithmetic to the reader.
   question_categorization: >
     Treat questions asking to predict or forecast future values, or asking
     about entities/metrics with no matching table or column in this model,

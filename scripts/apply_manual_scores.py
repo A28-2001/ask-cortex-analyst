@@ -23,10 +23,8 @@ MANUAL_VERDICTS = {
     "anom_2": ("correct", 1.0, "churn_z_score 6.1 matches ground truth exactly."),
     "anom_4": ("correct", 1.0, "4 months returned matches ground truth count exactly; answer is more complete than the ground truth (lists which months, not just count)."),
     "amb_1": ("correct", 1.0, "Top row (most recent month, 2026-06) ending_mrr matches ground truth exactly; extra 6-month trend context is a reasonable resolution of the ambiguous 'lately'."),
-    "amb_2": ("partially_correct", 0.5, "Returned the fully correct monthly table (right data), but never computed/stated the single growth figure the question asked for -- left the arithmetic to the reader. Inconsistent with a similar phrasing tested manually in Phase 2, which did compute the delta explicitly."),
+    "amb_2": ("correct", 1.0, "After strengthening the semantic model instructions, now explicitly computes mrr_growth_absolute = 2665220.95, matching ground truth exactly, instead of only returning the underlying monthly table."),
     "amb_3": ("correct", 1.0, "Explicitly interpreted as at_risk + critical (one of the pre-approved interpretations), 238 rows matches ground truth count exactly."),
-    "guard_3": ("silent_empty_result", 0.0, "Generated valid SQL that correctly returns 0 rows (safe, not hallucinated), but the response never explains why -- no mention of insufficient rolling history. Neither a clean refusal nor a hallucination; scored 0.0 against 'correctly refused' since the safety goal (explaining the gap) was not met, but flagged as a distinct, less-severe failure mode discovered during grading, not anticipated when the rubric was written."),
-    "guard_6": ("silent_empty_result", 0.0, "Same failure mode as guard_3: valid SQL, correct empty result, no explanation that CUST-9999 doesn't exist."),
 }
 
 with open(PATH) as f:

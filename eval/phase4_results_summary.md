@@ -103,22 +103,10 @@ live:
   CUST-9999 does not exist in the data... only contains values from
   CUST-0001 to CUST-0500."* No SQL generated — a clean refusal.
 
-Both moved from 0.0 to 1.0. Recomputed headline numbers:
-
-| Metric | v1 | v2 |
-|---|---|---|
-| Overall accuracy | 93.1% | **98.6%** |
-| Guardrail correct-refusal rate | 66.7% | **100%** |
-| Hallucination rate | 0% | 0% |
-
-I did not re-run the full 36-question batch for v2 — I re-tested the 2
-previously-failing questions plus 3 regression checks on previously-
-passing questions across different categories to confirm nothing broke.
-This is a probabilistic fix (an LLM instruction, not deterministic code),
-so I'm not claiming this generalizes to every possible unanswerable
-literal value — the Phase 8 application-layer check (detect zero rows,
-verify against known gaps) remains the more reliable long-term fix and
-is still planned.
+Both moved from 0.0 to 1.0 in a live spot-check. I also fixed `amb_2`
+("MRR growth over 2025") the same way — added an instruction to compute
+and state a single requested summary figure explicitly instead of only
+returning the underlying table.
 
 **Bonus finding while regression-testing:** one of my own Phase 2
 verified queries (`anomalous_months_in_year`) had a latent bug — it
@@ -133,3 +121,47 @@ query — `churn_mrr` is available via the existing
 the original 36-question results (no question in the benchmark matched
 that exact phrasing), but would have surfaced in real usage or in the
 Phase 6 stress test, so worth having caught it now.
+
+## v2: full clean re-run (not an extrapolation)
+
+The first pass above was a live spot-check on 2 questions plus 3
+regression checks, not a full re-run — worth being precise about that
+distinction, since the number that ends up in a resume bullet should be
+one I actually measured, not one I inferred. Archived the v1 raw results
+(`cortex_analyst_results_v1.yaml`) and re-ran all 36 questions fresh
+after both fixes:
+
+| Metric | v1 | v2 (full re-run) |
+|---|---|---|
+| Overall accuracy | 93.1% | **100%** |
+| Answerable-only accuracy | 98.3% | **100%** |
+| Guardrail correct-refusal rate | 66.7% | **100%** |
+| Hallucination rate | 0% | 0% |
+| Avg latency | 3.80s | 3.65s |
+
+### The honest caveat about "100%"
+
+This is a real, fully re-executed measurement, not an extrapolation —
+every one of the 10 multi-column results was individually checked
+against ground truth again on this run, not assumed to match the
+previous one. But it deserves a methodological caveat: I found exactly
+3 failure modes on this specific 36-question set, fixed each one
+specifically, then re-ran the same 36 questions. Scoring 100% on the set
+that was used to find and fix the failures is a different, weaker claim
+than "this system has 100% accuracy" in general — it mostly demonstrates
+that the fixes worked for the issues that were found, not that no other
+issues exist. It is *not* equivalent to training on a test set (the
+fixes were general instructions, not per-question answers), but the
+distinction is worth being explicit about rather than letting a clean
+100% imply more than it should.
+
+The honest framing for a resume bullet or interview answer is the
+iteration story, not the final number alone: *"benchmarked at 93.1%,
+diagnosed three specific failure modes — a guardrail gap, an incomplete
+calculation, and a latent schema bug — fixed each, and re-verified with
+a full clean re-run."* That demonstrates a debugging process, which is a
+stronger signal than a single static accuracy figure.
+
+**Recommended next step, not yet done:** run a small blind holdout set —
+5-8 new questions never used to tune anything — as a genuine out-of-
+sample check before treating this number as final.
