@@ -255,7 +255,11 @@ tables:
         expr: CUSTOMER_ID
         data_type: VARCHAR
         unique: true
-        description: Unique customer identifier.
+        description: >
+          Unique customer identifier, format CUST-#### running from
+          CUST-0001 to CUST-0500. If asked about an ID outside this range,
+          or a query on this column returns zero rows, say explicitly that
+          the customer ID does not exist rather than showing an empty result.
       - name: company_name
         expr: COMPANY_NAME
         data_type: VARCHAR
@@ -352,11 +356,13 @@ tables:
       calculated per MRR metric; months exceeding 2 standard deviations
       are flagged. This table does not distinguish segments — it cannot
       answer "was the SMB spike anomalous", only whether the company-wide
-      monthly movement was anomalous. The earliest month in the dataset has
-      no row here at all, since there isn't enough prior history to compute
-      a rolling average or z-score for it — if asked about anomalies for
-      that month, say there isn't enough history to evaluate it rather than
-      implying it was normal.
+      monthly movement was anomalous. January 2025 (the dataset's first
+      month) has no row here at all, since there isn't enough prior history
+      to compute a rolling average or z-score for it. If asked whether
+      January 2025 (or any month with no matching row) was anomalous, or if
+      a query against this table returns zero rows for a specific month,
+      say explicitly that there isn't enough history to evaluate that month
+      rather than showing an empty result or implying it was normal.
     base_table:
       database: NL_ASSISTANT_DB
       schema: ANALYTICS
@@ -490,10 +496,10 @@ verified_queries:
     question: Which months in 2025 had anomalous churn?
     verified_by: aakash
     sql: >
-      SELECT month, churn_mrr, churn_z_score
-      FROM anomaly_flags
-      WHERE churn_anomaly = TRUE AND month BETWEEN '2025-01-01' AND '2025-12-31'
-      ORDER BY month
+      SELECT a.month, a.churn_z_score
+      FROM anomaly_flags a
+      WHERE a.churn_anomaly = TRUE AND a.month BETWEEN '2025-01-01' AND '2025-12-31'
+      ORDER BY a.month
 
   - name: churn_mrr_in_flagged_months
     question: In months where churn was flagged as anomalous, what was the actual churn MRR?
@@ -525,7 +531,17 @@ module_custom_instructions:
     breakdown that is not defined in this semantic model (for example, a
     forecast, a metric with no corresponding column, or a segment cut of
     a company-wide-only table), say plainly that the data or metric is not
-    available rather than approximating or guessing an answer.
+    available rather than approximating or guessing an answer. A metric or
+    column existing is not the same as the answer existing: some questions
+    name a specific literal value (an exact date, a specific customer_id)
+    that may not actually be present in the data even though the column
+    and metric are perfectly valid. Before presenting SQL as a confident
+    answer, consider whether the specific value asked about is likely to
+    exist (e.g. is the date within the table's known range, is the ID in
+    the documented valid range). If you are not confident the value
+    exists, say so explicitly in your response alongside the SQL, rather
+    than presenting the query as if it will return a normal, meaningful
+    result.
   question_categorization: >
     Treat questions asking to predict or forecast future values, or asking
     about entities/metrics with no matching table or column in this model,

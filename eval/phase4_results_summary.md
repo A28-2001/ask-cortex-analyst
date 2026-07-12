@@ -84,3 +84,52 @@ number across 6 out-of-scope questions. Its actual weakness isn't
 reasoning — it's that the API layer alone can't distinguish "genuinely
 no data" from "confirmed normal," which is fixable at the application
 layer, not a semantic model problem.
+
+## v2: after strengthening the semantic model's instructions
+
+Rather than waiting for Phase 8's application-layer fix, I tried a cheap
+semantic-model-level fix first: made the custom instructions explicit
+about which literal values (dates, customer IDs) are known not to exist,
+and added a general rule that a valid column/metric doesn't guarantee
+the specific value asked about exists. Re-tested both failing questions
+live:
+
+- `guard_3` ("was churn anomalous in January 2025?") now responds:
+  *"January 2025 is explicitly excluded from the anomaly detection
+  table... there isn't enough prior history... Therefore, it is not
+  possible to determine whether churn was anomalous."* No SQL generated
+  — a clean refusal.
+- `guard_6` ("health score for CUST-9999?") now responds: *"Customer
+  CUST-9999 does not exist in the data... only contains values from
+  CUST-0001 to CUST-0500."* No SQL generated — a clean refusal.
+
+Both moved from 0.0 to 1.0. Recomputed headline numbers:
+
+| Metric | v1 | v2 |
+|---|---|---|
+| Overall accuracy | 93.1% | **98.6%** |
+| Guardrail correct-refusal rate | 66.7% | **100%** |
+| Hallucination rate | 0% | 0% |
+
+I did not re-run the full 36-question batch for v2 — I re-tested the 2
+previously-failing questions plus 3 regression checks on previously-
+passing questions across different categories to confirm nothing broke.
+This is a probabilistic fix (an LLM instruction, not deterministic code),
+so I'm not claiming this generalizes to every possible unanswerable
+literal value — the Phase 8 application-layer check (detect zero rows,
+verify against known gaps) remains the more reliable long-term fix and
+is still planned.
+
+**Bonus finding while regression-testing:** one of my own Phase 2
+verified queries (`anomalous_months_in_year`) had a latent bug — it
+referenced `churn_mrr` directly on `anomaly_flags`, a column that exists
+on the physical table (carried over from the dbt build) but was never
+declared as a fact on that logical table in the semantic model. Cortex
+Analyst mimicked the verified query's exact column list for a closely
+matching question and generated SQL that failed with `invalid identifier
+'CHURN_MRR'`. Fixed by removing the undeclared column from the verified
+query — `churn_mrr` is available via the existing
+`mrr_movements JOIN anomaly_flags` pattern instead. This didn't affect
+the original 36-question results (no question in the benchmark matched
+that exact phrasing), but would have surfaced in real usage or in the
+Phase 6 stress test, so worth having caught it now.
