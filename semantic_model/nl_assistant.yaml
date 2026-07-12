@@ -35,7 +35,7 @@ tables:
       - name: ending_mrr
         expr: ENDING_MRR
         data_type: NUMBER
-        synonyms: ["total MRR", "current MRR", "MRR"]
+        synonyms: ["total MRR", "current MRR", "MRR", "revenue"]
         description: >
           Point-in-time cumulative MRR balance at the end of this month,
           company-wide. A snapshot, not a flow — do not sum across months.
@@ -48,14 +48,17 @@ tables:
       - name: expansion_mrr
         expr: EXPANSION_MRR
         data_type: NUMBER
+        synonyms: ["upsell MRR", "upgrade MRR"]
         description: MRR gained this month from existing customers upgrading. A flow — safe to sum across a date range.
       - name: contraction_mrr
         expr: CONTRACTION_MRR
         data_type: NUMBER
+        synonyms: ["downgrade MRR"]
         description: MRR lost this month from existing customers downgrading (positive value). A flow — safe to sum across a date range.
       - name: churn_mrr
         expr: CHURN_MRR
         data_type: NUMBER
+        synonyms: ["cancelled MRR", "cancellation MRR"]
         description: MRR lost this month from cancelled customers (positive value). A flow — safe to sum across a date range.
       - name: reactivation_mrr
         expr: REACTIVATION_MRR
@@ -68,10 +71,12 @@ tables:
       - name: new_customers
         expr: NEW_CUSTOMERS
         data_type: NUMBER
+        synonyms: ["new logos"]
         description: Count of new customers acquired this month.
       - name: churned_customers
         expr: CHURNED_CUSTOMERS
         data_type: NUMBER
+        synonyms: ["cancelled customers", "lost customers"]
         description: Count of customers who churned this month.
       - name: net_revenue_retention_pct
         expr: NET_REVENUE_RETENTION_PCT
@@ -264,7 +269,12 @@ tables:
       - name: industry
         expr: INDUSTRY
         data_type: VARCHAR
-        description: Customer's industry.
+        sample_values: ["CyberSecurity", "E-Commerce", "EdTech", "FinTech", "HR Tech", "HealthTech", "LegalTech", "Logistics", "MarTech", "PropTech"]
+        description: >
+          Customer's industry. These are the exact stored values (mixed
+          case, no spaces except "HR Tech") — match against this list
+          rather than guessing a casual phrasing like "fintech" or
+          "healthcare" literally.
       - name: sales_rep
         expr: SALES_REP
         data_type: VARCHAR
@@ -342,7 +352,11 @@ tables:
       calculated per MRR metric; months exceeding 2 standard deviations
       are flagged. This table does not distinguish segments — it cannot
       answer "was the SMB spike anomalous", only whether the company-wide
-      monthly movement was anomalous.
+      monthly movement was anomalous. The earliest month in the dataset has
+      no row here at all, since there isn't enough prior history to compute
+      a rolling average or z-score for it — if asked about anomalies for
+      that month, say there isn't enough history to evaluate it rather than
+      implying it was normal.
     base_table:
       database: NL_ASSISTANT_DB
       schema: ANALYTICS
@@ -419,13 +433,6 @@ relationships:
       - left_column: month
         right_column: month
 
-  - name: customer_health_to_cohort_retention
-    left_table: customer_health_scores
-    right_table: cohort_retention
-    relationship_columns:
-      - left_column: cohort_month
-        right_column: cohort_month
-
 verified_queries:
   - name: mrr_for_specific_month
     question: What was our total MRR in June 2026?
@@ -488,6 +495,16 @@ verified_queries:
       WHERE churn_anomaly = TRUE AND month BETWEEN '2025-01-01' AND '2025-12-31'
       ORDER BY month
 
+  - name: churn_mrr_in_flagged_months
+    question: In months where churn was flagged as anomalous, what was the actual churn MRR?
+    verified_by: aakash
+    sql: >
+      SELECT m.month, m.churn_mrr, a.churn_z_score
+      FROM mrr_movements m
+      JOIN anomaly_flags a ON m.month = a.month
+      WHERE a.churn_anomaly = TRUE
+      ORDER BY m.month
+
 module_custom_instructions:
   sql_generation: >
     mrr_movements and anomaly_flags are company-wide; use
@@ -499,7 +516,12 @@ module_custom_instructions:
     net_new_mrr are period flows and are safe to sum across a date range.
     anomaly_flags reflects company-wide monthly movements only and has no
     segment breakdown, so it cannot confirm whether a segment-specific
-    trend was anomalous. If a question asks for a metric, time period, or
+    trend was anomalous. customer_health_scores already has its own
+    cohort_month column, so any question about a cohort's customers
+    (e.g. average health score for the January 2025 cohort) should filter
+    customer_health_scores directly rather than joining to cohort_retention,
+    which is a separate cohort-level aggregate table and would double-count
+    customers if joined naively. If a question asks for a metric, time period, or
     breakdown that is not defined in this semantic model (for example, a
     forecast, a metric with no corresponding column, or a segment cut of
     a company-wide-only table), say plainly that the data or metric is not
