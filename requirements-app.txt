@@ -1,0 +1,6 @@
+snowflake-connector-python==4.6.0
+python-dotenv==1.2.2
+PyJWT==2.13.0
+chainlit==2.11.1
+requests==2.34.2
+cryptography==49.0.0
