@@ -14,4 +14,4 @@ COPY chainlit.md .
 
 EXPOSE 7860
 
-CMD ["chainlit", "run", "chainlit_app/app.py", "--host", "0.0.0.0", "--port", "7860", "--headless"]
+CMD ["uvicorn", "chainlit_app.server:app", "--host", "0.0.0.0", "--port", "7860"]
