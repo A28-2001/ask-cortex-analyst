@@ -11,3 +11,24 @@
   --primary-foreground: 0 0% 100% !important;
   --font-sans: 'Plus Jakarta Sans', sans-serif !important;
 }
+
+/* Logo + wordmark lockup on the empty-chat welcome screen (see custom.js,
+   which inserts the .brand-lockup wrapper and .brand-lockup-text label). */
+.welcome-screen .logo {
+  width: 64px !important;
+  height: 64px !important;
+  margin-bottom: 0 !important;
+}
+
+.brand-lockup {
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-lockup-text {
+  font-size: 28px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
