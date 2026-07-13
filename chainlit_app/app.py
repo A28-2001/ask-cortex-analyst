@@ -120,7 +120,7 @@ async def handle_question(question: str):
     # No SQL at all: a clean refusal (guardrail case) -- style it distinctly from a data answer.
     if not sql_stmt:
         await cl.Message(
-            content="**Can't answer this** — " + (text or "I don't have enough information to answer that."),
+            content="**Can't answer this** — " + (display_text or "I don't have enough information to answer that."),
             actions=actions,
         ).send()
         return
@@ -141,7 +141,7 @@ async def handle_question(question: str):
     # it prominently instead of a silent empty result.
     if not rows:
         await cl.Message(
-            content="**No matching data** — " + (text or "That query ran successfully but returned no matching data."),
+            content="**No matching data** — " + (display_text or "That query ran successfully but returned no matching data."),
             actions=actions,
         ).send()
         return
