@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary: 173 80% 40% !important;
+  --primary-foreground: 0 0% 100% !important;
+  --font-sans: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.dark {
+  --primary: 173 70% 45% !important;
+  --primary-foreground: 0 0% 100% !important;
+  --font-sans: 'Plus Jakarta Sans', sans-serif !important;
+}
