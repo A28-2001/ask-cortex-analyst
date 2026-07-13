@@ -165,3 +165,37 @@ stronger signal than a single static accuracy figure.
 **Recommended next step, not yet done:** run a small blind holdout set —
 5-8 new questions never used to tune anything — as a genuine out-of-
 sample check before treating this number as final.
+
+## Holdout set: genuine out-of-sample check
+
+8 questions, written after all fixes were already in place, never used
+to test or tune the semantic model. Ground truth computed independently
+first, same as the main benchmark (see `scripts/run_holdout_eval.py`,
+raw results in `eval/holdout_results.yaml`).
+
+Two of the eight were designed specifically to test *generalization*,
+not repetition, of the guardrail fixes:
+- `h7` asked about customer `CUST-0777` — a different nonexistent ID
+  than the `CUST-9999` used to diagnose the original fix.
+- `h8` asked about "gross margin" — a completely novel undefined-metric
+  question, not one of the original 6 guardrail cases.
+
+| id | question | result |
+|---|---|---|
+| h1 | Ending MRR in August 2025 | Correct (exact match) |
+| h2 | New MRR added, H1 2025 | Correct (exact match) |
+| h3 | SMB segment NRR, October 2025 | Correct (exact match) |
+| h4 | June 2025 cohort retention at 4 months | Correct (exact match) |
+| h5 | Avg NRR in anomalous months, 2025 | Correct (within tolerance) |
+| h6 | MRR growth, Q1 2026 | Correct (exact match) |
+| h7 | Health score for CUST-0777 (novel nonexistent ID) | Correctly refused, named the exact valid range |
+| h8 | Gross margin (novel undefined metric) | Correctly refused, explained the missing cost data |
+
+**8/8 correct.** This is a genuinely stronger result than the v2 full
+re-run, precisely because these questions were never seen during
+tuning — `h7` and `h8` in particular show the fixes generalized to new
+literal values and a new metric type, not just the exact cases that
+were diagnosed. Worth still being honest about scale: 8 questions is a
+small sample, so this confirms the direction and quality of the fixes
+rather than proving zero remaining edge cases exist anywhere in the
+system.
