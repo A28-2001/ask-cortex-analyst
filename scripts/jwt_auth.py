@@ -3,8 +3,9 @@ import hashlib
 from datetime import timedelta, timezone, datetime
 
 import jwt
-from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
+
+from snowflake_auth import load_private_key
 
 
 def prepare_account_name_for_jwt(raw_account: str) -> str:
@@ -20,12 +21,11 @@ def prepare_account_name_for_jwt(raw_account: str) -> str:
     return account.upper()
 
 
-def generate_jwt(account: str, user: str, private_key_path: str, lifetime_minutes: int = 59) -> str:
+def generate_jwt(account: str, user: str, private_key_path: str = None, lifetime_minutes: int = 59) -> str:
     account_for_jwt = prepare_account_name_for_jwt(account)
     qualified_username = f"{account_for_jwt}.{user.upper()}"
 
-    with open(private_key_path, "rb") as f:
-        private_key = serialization.load_pem_private_key(f.read(), password=None, backend=default_backend())
+    private_key = load_private_key()
 
     public_key_raw = private_key.public_key().public_bytes(
         serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo

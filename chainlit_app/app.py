@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 from ask_cortex_analyst import ask, CortexAnalystError  # noqa: E402
+from snowflake_auth import private_key_der  # noqa: E402
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
@@ -16,7 +17,7 @@ def get_connection():
     return snowflake.connector.connect(
         account=os.environ["SNOWFLAKE_ACCOUNT"],
         user=os.environ["SNOWFLAKE_USER"],
-        private_key_file=os.environ["SNOWFLAKE_PRIVATE_KEY_PATH"],
+        private_key=private_key_der(),
         role=os.environ["SNOWFLAKE_ROLE"],
         warehouse=os.environ["SNOWFLAKE_WAREHOUSE"],
         database=os.environ["SNOWFLAKE_DATABASE"],

@@ -9,7 +9,8 @@ load_dotenv()
 
 ACCOUNT = os.environ["SNOWFLAKE_ACCOUNT"]
 USER = os.environ["SNOWFLAKE_USER"]
-KEY_PATH = os.environ["SNOWFLAKE_PRIVATE_KEY_PATH"]
+# Key content comes from SNOWFLAKE_PRIVATE_KEY (deployed) or SNOWFLAKE_PRIVATE_KEY_PATH
+# (local dev) -- see snowflake_auth.load_private_key(), which generate_jwt() uses directly.
 
 HOST_ACCOUNT = ACCOUNT.lower()
 BASE_URL = f"https://{HOST_ACCOUNT}.snowflakecomputing.com"
@@ -30,7 +31,7 @@ def ask(question: str, history: list | None = None) -> tuple[dict, list, float]:
     Returns (response_json, updated_history, latency_seconds). Raises CortexAnalystError
     on network failures or non-2xx responses instead of letting requests throw raw.
     """
-    token = generate_jwt(ACCOUNT, USER, KEY_PATH)
+    token = generate_jwt(ACCOUNT, USER)
     with open(SEMANTIC_MODEL_PATH, "r") as f:
         semantic_model_yaml = f.read()
 
