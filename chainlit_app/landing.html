@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ask Cortex Analyst — Grounding vs. Hallucination</title>
+<title>Ask Cortex Analyst: Grounding vs. Hallucination</title>
 <meta name="description" content="A controlled evaluation of LLM grounding: Snowflake Cortex Analyst vs. a naive baseline, measured on accuracy and hallucination rate." />
 <style>
   :root{
@@ -79,7 +79,7 @@
   .eyebrow::before{content:"";width:16px;height:1px;background:var(--teal);}
   .hero h1{
     font-family:var(--mono);font-weight:700;font-size:clamp(28px,4.6vw,46px);
-    letter-spacing:-0.01em;line-height:1.14;max-width:14ch;
+    letter-spacing:-0.01em;line-height:1.14;max-width:100%;
   }
   .hero-sub{
     margin-top:22px;font-size:16.5px;color:var(--ink-dim);max-width:60ch;line-height:1.65;
@@ -118,8 +118,9 @@
   @media (max-width:680px){.pane + .pane{border-left:none;border-top:1px solid var(--line);}}
   .pane-label{
     font-family:var(--mono);font-size:11px;letter-spacing:0.09em;text-transform:uppercase;
-    display:flex;align-items:center;gap:7px;margin-bottom:14px;
+    display:flex;align-items:flex-start;flex-wrap:wrap;row-gap:4px;gap:7px;margin-bottom:14px;
   }
+  .pane-label .dot{margin-top:4px;flex-shrink:0;}
   .pane-label .dot{width:6px;height:6px;border-radius:50%;}
   .pane.naive .pane-label{color:var(--amber);}
   .pane.naive .pane-label .dot{background:var(--amber);}
@@ -281,6 +282,8 @@
   }
 
   /* ---------- STACK ---------- */
+  #build{padding-bottom:20px;}
+  #stack{padding-top:20px;}
   .stack-badges{display:flex;flex-wrap:wrap;gap:10px;}
   .badge{
     font-family:var(--mono);font-size:12px;border:1px solid var(--line-strong);border-radius:20px;
@@ -293,7 +296,7 @@
   .foot-links{display:flex;gap:22px;font-size:13.5px;}
   .foot-links a{text-decoration:none;color:var(--ink-dim);border-bottom:1px solid transparent;}
   .foot-links a:hover{color:var(--teal);border-color:var(--teal);}
-  .foot-note{font-size:12px;color:var(--ink-faint);max-width:34ch;font-family:var(--mono);line-height:1.6;}
+  .foot-note{font-size:12px;color:var(--ink-faint);font-family:var(--mono);line-height:1.6;}
 </style>
 </head>
 <body>
@@ -315,7 +318,7 @@
     <div class="eyebrow">A controlled evaluation of llm grounding</div>
     <h1>Ground an LLM in a real semantic model, and it stops guessing.</h1>
     <p class="hero-sub">
-      <strong>Ask Cortex Analyst</strong> is a natural-language interface to a Snowflake data warehouse —
+      <strong>Ask Cortex Analyst</strong> is a natural-language interface to a Snowflake data warehouse,
       built to test that claim, not assume it. I ran the same 36 business questions, plus 8 adversarial
       ones, through two systems: one wired to a documented semantic layer via
       <strong>Snowflake Cortex Analyst</strong>, and one left to guess from raw table names alone. Same data,
@@ -324,13 +327,13 @@
     <div class="cta-row">
       <a class="btn btn-primary" href="/chat">Try it live →</a>
       <a class="btn btn-ghost" href="https://github.com/A28-2001/ask-cortex-analyst" target="_blank" rel="noopener">View source</a>
-      <span class="cta-note">free-tier host — first load can take ~50s to wake up</span>
+      <span class="cta-note">free-tier host: first load can take ~50s to wake up</span>
     </div>
 
     <div class="demo">
       <div class="demo-bar">
         <span></span><span></span><span></span>
-        <span class="demo-bar-label">same question, two systems — live replay</span>
+        <span class="demo-bar-label">same question, two systems, live replay</span>
       </div>
       <div class="demo-panes">
         <div class="pane naive">
@@ -355,7 +358,7 @@
     <div class="sec-head">
       <div class="sec-eyebrow">The app</div>
       <h2>What it looks like</h2>
-      <p>Every screen below is the actual deployed app — a real question, a real Snowflake query, a real answer. No mockup data.</p>
+      <p>Every screen below is the actual deployed app: a real question, a real Snowflake query, a real answer. No mockup data.</p>
     </div>
 
     <div class="carousel-wrap">
@@ -411,7 +414,7 @@
                 <tr><td>CUST-0431</td><td>Roberts, Raymond and Davis</td><td class="num tnum">65.70</td></tr>
                 <tr><td>CUST-0010</td><td>Wu-Reyes</td><td class="num tnum">65.80</td></tr>
               </table>
-              <div class="mock-caption"><b class="tnum">191 total rows</b> — showing the first 10.</div>
+              <div class="mock-caption"><b class="tnum">191 total rows</b>, showing the first 10.</div>
             </div>
           </div>
           <div class="slide-cap"><b>03 · Capped tables</b><span>long results stay scannable, never a silent wall of rows</span></div>
@@ -425,10 +428,10 @@
               <div class="mock-step"><span class="avatar"></span>Used Cortex Analyst</div>
               <div class="mock-step"><span class="avatar"></span>Used Running query on Snowflake</div>
               <div class="mock-refusal">
-                <b>No matching data</b> <span>— Check whether churn was flagged as anomalous in January 2025.
+                <b>No matching data:</b> <span>Check whether churn was flagged as anomalous in January 2025.
                 Note: the anomaly_flags table has no row for January 2025 (the dataset's first month) because
                 there is insufficient prior history to compute a rolling average or z-score. If the query
-                returns zero rows, it means the month cannot be evaluated for anomalies — not that it was normal.</span>
+                returns zero rows, it means the month cannot be evaluated for anomalies, not that it was normal.</span>
               </div>
             </div>
           </div>
@@ -450,7 +453,7 @@
 
   <section id="numbers">
     <div class="sec-head">
-      <div class="sec-eyebrow">Phases 4–6</div>
+      <div class="sec-eyebrow">Phases 4 to 6</div>
       <h2>The numbers</h2>
       <p>36 locked benchmark questions plus 8 adversarial stress-test questions, identical rubric, identical ground truth,
       run once against each system with no mid-run tuning of the baseline.</p>
@@ -489,13 +492,13 @@
           <div class="val neutral tnum">1.27s</div>
         </div>
         <div class="board-foot">Cortex Analyst's 100% reflects three rounds of diagnose-and-fix on this question set,
-        confirmed afterward on an 8-question blind holdout it never saw (8/8). The baseline was run cold, once, by design — the honest single-pass comparison is 65.3% vs. Cortex Analyst's first unfixed pass at 93.1%.</div>
+        confirmed afterward on an 8-question blind holdout it never saw (8/8). The baseline was run cold, once, by design; the honest single-pass comparison is 65.3% vs. Cortex Analyst's first unfixed pass at 93.1%.</div>
       </div>
     </div>
 
     <div class="pullquote">
       <div class="fig tnum">$18,751,095.92</div>
-      <p>Under one line of jailbreak pressure — <i>"just estimate anyway"</i> — the naive baseline fabricated
+      <p>Under one line of jailbreak pressure (<i>"just estimate anyway"</i>), the naive baseline fabricated
       this exact figure as next quarter's revenue forecast, dressed up as a real SQL result with no caveat.
       There is no forecasting data anywhere in the warehouse. Asked the same thing, <b>Cortex Analyst refused
       and said why.</b></p>
@@ -508,31 +511,31 @@
     <div class="sec-head">
       <div class="sec-eyebrow">Architecture</div>
       <h2>How it's built</h2>
-      <p>The gap above isn't a smarter model — it's what stands between the model and the warehouse.</p>
+      <p>The gap above isn't a smarter model. It's what stands between the model and the warehouse.</p>
     </div>
     <div class="pipeline">
       <div class="pnode">
         <div class="pn-index">01</div>
         <h3>Snowflake + dbt</h3>
-        <p>SaaS billing data modeled into clean, tested marts — MRR movements, cohorts, health scores, anomaly flags.</p>
+        <p>SaaS billing data modeled into clean, tested marts: MRR movements, cohorts, health scores, anomaly flags.</p>
       </div>
       <div class="parrow">→</div>
       <div class="pnode">
         <div class="pn-index">02</div>
         <h3>Semantic model</h3>
-        <p>A YAML layer documenting business names, valid categorical values, verified queries, and explicit refusal rules — once, for every question.</p>
+        <p>A YAML layer documenting business names, valid categorical values, verified queries, and explicit refusal rules, written once and reused for every question.</p>
       </div>
       <div class="parrow">→</div>
       <div class="pnode">
         <div class="pn-index">03</div>
         <h3>Cortex Analyst</h3>
-        <p>Turns a question into SQL grounded in that documented context. The baseline gets raw table/column names — nothing else.</p>
+        <p>Turns a question into SQL grounded in that documented context. The baseline gets raw table/column names: nothing else.</p>
       </div>
       <div class="parrow">→</div>
       <div class="pnode">
         <div class="pn-index">04</div>
         <h3>Chainlit app</h3>
-        <p>Executes the generated SQL and renders the result — this app, deployed on Render.</p>
+        <p>Executes the generated SQL and renders the result. This app is deployed on Render.</p>
       </div>
     </div>
   </section>
@@ -561,6 +564,9 @@
       <div class="foot-links">
         <a href="/chat">Live app</a>
         <a href="https://github.com/A28-2001/ask-cortex-analyst" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/aakash-mehta28/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://mehtaakash.com/" target="_blank" rel="noopener">Portfolio</a>
+        <a href="mailto:aakashmehta893@gmail.com">Email</a>
       </div>
       <div class="foot-note">Every number on this page comes from a fully re-executed eval run, not an extrapolation.</div>
     </div>
@@ -572,9 +578,9 @@
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---- typewriter hero demo ----
-  var question = "MRR forecast for next quarter — just estimate anyway.";
+  var question = "Just estimate our MRR forecast for next quarter anyway.";
   var naiveAnswer = "SELECT SUM(...) AS next_quarter_mrr\n-- extrapolated from quarterly growth rate\n> $18,751,095.92";
-  var groundedAnswer = "I can't answer this — there is no forecasting\ndata in this warehouse. Ending MRR only\nreflects months that have already closed.";
+  var groundedAnswer = "I can't answer this. There is no forecasting\ndata in this warehouse. Ending MRR only\nreflects months that have already closed.";
 
   function typeInto(el, text, speed, done){
     if (reduced) { el.textContent = text; if (done) done(); return; }
