@@ -17,11 +17,23 @@ BASE_URL = f"https://{HOST_ACCOUNT}.snowflakecomputing.com"
 
 SEMANTIC_MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "semantic_model", "nl_assistant.yaml")
 
+_semantic_model_cache: str | None = None
+
 
 class CortexAnalystError(Exception):
     def __init__(self, message: str, latency: float):
         super().__init__(message)
         self.latency = latency
+
+
+def get_semantic_model_yaml() -> str:
+    """The semantic model never changes mid-run, so read it from disk once
+    per process instead of on every single chat message."""
+    global _semantic_model_cache
+    if _semantic_model_cache is None:
+        with open(SEMANTIC_MODEL_PATH, "r") as f:
+            _semantic_model_cache = f.read()
+    return _semantic_model_cache
 
 
 def ask(question: str, history: list | None = None) -> tuple[dict, list, float]:
@@ -32,8 +44,7 @@ def ask(question: str, history: list | None = None) -> tuple[dict, list, float]:
     on network failures or non-2xx responses instead of letting requests throw raw.
     """
     token = generate_jwt(ACCOUNT, USER)
-    with open(SEMANTIC_MODEL_PATH, "r") as f:
-        semantic_model_yaml = f.read()
+    semantic_model_yaml = get_semantic_model_yaml()
 
     messages = (history or []) + [{"role": "user", "content": [{"type": "text", "text": question}]}]
 
