@@ -1,14 +1,6 @@
----
-title: SaaS Analytics Assistant
-emoji: 📊
-colorFrom: green
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
----
+# Ask Cortex Analyst
 
-# Natural-Language Data Assistant (Snowflake Cortex Analyst)
+A natural-language data assistant built on Snowflake Cortex Analyst.
 
 A text-to-SQL business intelligence assistant grounded by a Cortex
 Analyst semantic model over a real SaaS subscription dataset (500
@@ -45,7 +37,7 @@ found and fixed along the way, are in `eval/`:
 - `dbt_project/` — the migrated dbt models (staging + marts) running on Snowflake
 - `semantic_model/nl_assistant.yaml` — the Cortex Analyst semantic model
 - `eval/` — rubric, question bank, ground truth, and results for every eval phase
-- `chainlit_app/` — the chat interface (this Space)
+- `chainlit_app/` — the chat interface
 - `scripts/` — migration, eval harness, and Cortex Analyst client code
 
 ## Running locally

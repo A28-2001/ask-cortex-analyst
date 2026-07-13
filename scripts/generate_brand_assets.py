@@ -69,12 +69,12 @@ favicon = bar_chart_mark(64)
 favicon.save(os.path.join(BASE, "favicon.png"))
 favicon.convert("RGB").save(os.path.join(BASE, "favicon.ico"), sizes=[(16, 16), (32, 32), (64, 64)])
 
-# Avatars: Cortex Analyst gets the brand bar-chart mark (it *is* the analytics
-# engine); the default message author gets the dot mark in navy for clear
-# visual contrast. Chainlit looks up avatars by author name, lowercased with
-# spaces -> underscores -- the default author is the app's [UI].name in
-# config.toml ("SaaS Analytics Assistant"), NOT literally "assistant".
+# Avatars: the "Cortex Analyst" step gets the brand bar-chart mark (it *is*
+# the analytics engine); the default message author gets the dot mark in
+# navy for clear visual contrast. Chainlit looks up avatars by author name,
+# lowercased with spaces -> underscores -- the default author is the app's
+# [UI].name in config.toml ("Ask Cortex Analyst" -> ask_cortex_analyst.png).
 bar_chart_mark(128).save(os.path.join(AVATARS, "cortex_analyst.png"))
-dot_mark(128).save(os.path.join(AVATARS, "saas_analytics_assistant.png"))
+dot_mark(128).save(os.path.join(AVATARS, "ask_cortex_analyst.png"))
 
 print("Generated:", os.listdir(BASE), os.listdir(AVATARS))

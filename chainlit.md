@@ -1,4 +1,4 @@
-## SaaS Analytics Assistant
+## Ask Cortex Analyst
 
 Ask questions about MRR, churn, cohort retention, customer health, and
 anomalies in plain English — grounded by a Cortex Analyst semantic
