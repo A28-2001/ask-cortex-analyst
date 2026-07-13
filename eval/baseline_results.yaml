@@ -1,0 +1,731 @@
+results:
+- id: pit_1
+  category: point_in_time
+  type: answerable
+  question: What was our total MRR in March 2025?
+  ground_truth_sql: SELECT ending_mrr FROM mrr_movements WHERE month = '2025-03-01'
+  ground_truth_value: '655935.36'
+  generated_sql: "SELECT ending_mrr \nFROM mrr_movements \nWHERE month = '2025-03-01';"
+  raw_response: "```sql\nSELECT ending_mrr \nFROM mrr_movements \nWHERE month = '2025-03-01';\n```"
+  actual_rows:
+  - - 655935.36
+  exec_error: null
+  latency: 0.65
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: pit_2
+  category: point_in_time
+  type: answerable
+  question: What was our starting MRR in September 2025?
+  ground_truth_sql: SELECT starting_mrr FROM mrr_movements WHERE month = '2025-09-01'
+  ground_truth_value: '1512773.33'
+  generated_sql: "SELECT starting_mrr \nFROM mrr_movements \nWHERE month = '2025-09-01';"
+  raw_response: "```sql\nSELECT starting_mrr \nFROM mrr_movements \nWHERE month = '2025-09-01';\n```"
+  actual_rows:
+  - - 1512773.33
+  exec_error: null
+  latency: 0.5
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: pit_3
+  category: point_in_time
+  type: answerable
+  question: How many customers did we churn in July 2025?
+  ground_truth_sql: SELECT churned_customers FROM mrr_movements WHERE month = '2025-07-01'
+  ground_truth_value: '10'
+  generated_sql: "SELECT SUM(churned_customers) \nFROM mrr_movements \nWHERE EXTRACT(MONTH FROM month)\
+    \ = 7 AND EXTRACT(YEAR FROM month) = 2025;"
+  raw_response: "```sql\nSELECT SUM(churned_customers) \nFROM mrr_movements \nWHERE EXTRACT(MONTH FROM\
+    \ month) = 7 AND EXTRACT(YEAR FROM month) = 2025;\n```"
+  actual_rows:
+  - - 10
+  exec_error: null
+  latency: 0.35
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: pit_4
+  category: point_in_time
+  type: answerable
+  question: How many new customers did we acquire in October 2025?
+  ground_truth_sql: SELECT new_customers FROM mrr_movements WHERE month = '2025-10-01'
+  ground_truth_value: '34'
+  generated_sql: "SELECT SUM(new_customers) \nFROM mrr_movements \nWHERE EXTRACT(MONTH FROM month) = 10\
+    \ AND EXTRACT(YEAR FROM month) = 2025;"
+  raw_response: "```sql\nSELECT SUM(new_customers) \nFROM mrr_movements \nWHERE EXTRACT(MONTH FROM month)\
+    \ = 10 AND EXTRACT(YEAR FROM month) = 2025;\n```"
+  actual_rows:
+  - - 34
+  exec_error: null
+  latency: 0.46
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: agg_1
+  category: period_aggregation
+  type: answerable
+  question: How much churn MRR did we lose in Q1 2025?
+  ground_truth_sql: SELECT SUM(churn_mrr) FROM mrr_movements WHERE month BETWEEN '2025-01-01' AND '2025-03-31'
+  ground_truth_value: '2966.6'
+  generated_sql: "SELECT SUM(churn_mrr) \nFROM mrr_movements \nWHERE EXTRACT(QUARTER FROM month) = 1 AND\
+    \ EXTRACT(YEAR FROM month) = 2025;"
+  raw_response: "```sql\nSELECT SUM(churn_mrr) \nFROM mrr_movements \nWHERE EXTRACT(QUARTER FROM month)\
+    \ = 1 AND EXTRACT(YEAR FROM month) = 2025;\n```"
+  actual_rows:
+  - - 2966.6
+  exec_error: null
+  latency: 0.23
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: agg_2
+  category: period_aggregation
+  type: answerable
+  question: How much expansion MRR did we generate in the second half of 2025?
+  ground_truth_sql: SELECT SUM(expansion_mrr) FROM mrr_movements WHERE month BETWEEN '2025-07-01' AND
+    '2025-12-31'
+  ground_truth_value: '203314.64'
+  generated_sql: "SELECT SUM(expansion_mrr) \nFROM mrr_movements \nWHERE EXTRACT(YEAR FROM month) = 2025\
+    \ \nAND EXTRACT(MONTH FROM month) > 6;"
+  raw_response: "```sql\nSELECT SUM(expansion_mrr) \nFROM mrr_movements \nWHERE EXTRACT(YEAR FROM month)\
+    \ = 2025 \nAND EXTRACT(MONTH FROM month) > 6;\n```"
+  actual_rows:
+  - - 203314.64
+  exec_error: null
+  latency: 0.42
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: agg_3
+  category: period_aggregation
+  type: answerable
+  question: What was our net new MRR for all of 2025?
+  ground_truth_sql: SELECT SUM(net_new_mrr) FROM mrr_movements WHERE month BETWEEN '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '2665220.95'
+  generated_sql: "SELECT SUM(net_new_mrr) \nFROM mrr_movements \nWHERE EXTRACT(YEAR FROM month) = 2025;"
+  raw_response: "```sql\nSELECT SUM(net_new_mrr) \nFROM mrr_movements \nWHERE EXTRACT(YEAR FROM month)\
+    \ = 2025;\n```"
+  actual_rows:
+  - - 2665220.95
+  exec_error: null
+  latency: 0.33
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: agg_4
+  category: period_aggregation
+  type: answerable
+  question: How many new customers did we add in Q4 2025?
+  ground_truth_sql: SELECT SUM(new_customers) FROM mrr_movements WHERE month BETWEEN '2025-10-01' AND
+    '2025-12-31'
+  ground_truth_value: '88'
+  generated_sql: "SELECT SUM(new_customers) \nFROM mrr_movements \nWHERE EXTRACT(QUARTER FROM month) =\
+    \ 4 AND EXTRACT(YEAR FROM month) = 2025;"
+  raw_response: "```sql\nSELECT SUM(new_customers) \nFROM mrr_movements \nWHERE EXTRACT(QUARTER FROM month)\
+    \ = 4 AND EXTRACT(YEAR FROM month) = 2025;\n```"
+  actual_rows:
+  - - 88
+  exec_error: null
+  latency: 0.53
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: seg_1
+  category: segment
+  type: answerable
+  question: How much churn MRR did the enterprise segment have in 2025?
+  ground_truth_sql: SELECT SUM(churn_mrr) FROM mrr_movements_by_segment WHERE segment = 'enterprise' AND
+    month BETWEEN '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '0.0'
+  generated_sql: "SELECT SUM(churn_mrr) \nFROM mrr_movements_by_segment \nWHERE segment = 'enterprise'\
+    \ AND EXTRACT(YEAR FROM month) = 2025;"
+  raw_response: "```sql\nSELECT SUM(churn_mrr) \nFROM mrr_movements_by_segment \nWHERE segment = 'enterprise'\
+    \ AND EXTRACT(YEAR FROM month) = 2025;\n```"
+  actual_rows:
+  - - 0.0
+  exec_error: null
+  latency: 0.27
+  score: 1.0
+  verdict: correct
+  reason: Exact match (correctly guessed lowercase 'enterprise').
+- id: seg_2
+  category: segment
+  type: answerable
+  question: What was the mid-market segment's ending MRR in December 2025?
+  ground_truth_sql: SELECT ending_mrr FROM mrr_movements_by_segment WHERE segment = 'mid_market' AND month
+    = '2025-12-01'
+  ground_truth_value: '662760.55'
+  generated_sql: "SELECT ending_mrr \nFROM mrr_movements_by_segment \nWHERE segment = 'mid-market' AND\
+    \ month = '2025-12-01';"
+  raw_response: "```sql\nSELECT ending_mrr \nFROM mrr_movements_by_segment \nWHERE segment = 'mid-market'\
+    \ AND month = '2025-12-01';\n```"
+  actual_rows: []
+  exec_error: null
+  latency: 0.48
+  score: 0.0
+  verdict: incorrect
+  reason: Filtered segment = 'mid-market' (hyphen) instead of the actual stored value 'mid_market' (underscore)
+    -- zero rows returned, no explanation given.
+- id: seg_3
+  category: segment
+  type: answerable
+  question: Which segment had the most new MRR in Q3 2025?
+  ground_truth_sql: SELECT segment FROM mrr_movements_by_segment WHERE month BETWEEN '2025-07-01' AND
+    '2025-09-30' GROUP BY segment ORDER BY SUM(new_mrr) DESC LIMIT 1
+  ground_truth_value: enterprise
+  generated_sql: 'SELECT segment
+
+    FROM mrr_movements_by_segment
+
+    WHERE EXTRACT(QUARTER FROM month) = 3 AND EXTRACT(YEAR FROM month) = 2025
+
+    ORDER BY new_mrr DESC
+
+    LIMIT 1;'
+  raw_response: '```sql
+
+    SELECT segment
+
+    FROM mrr_movements_by_segment
+
+    WHERE EXTRACT(QUARTER FROM month) = 3 AND EXTRACT(YEAR FROM month) = 2025
+
+    ORDER BY new_mrr DESC
+
+    LIMIT 1;
+
+    ```'
+  actual_rows:
+  - - enterprise
+  exec_error: null
+  latency: 0.71
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: seg_4
+  category: segment
+  type: answerable
+  question: What drove the July 2025 SMB churn increase?
+  ground_truth_sql: SELECT new_mrr, expansion_mrr, contraction_mrr, churn_mrr FROM mrr_movements_by_segment
+    WHERE segment = 'smb' AND month = '2025-07-01'
+  ground_truth_value: '[(14025.54, 1314.77, 1316.87, 19629.01)]'
+  generated_sql: "WITH smb_churn AS (\n  SELECT \n    month,\n    churn_mrr,\n    LAG(churn_mrr) OVER\
+    \ (ORDER BY month) AS prev_churn_mrr\n  FROM \n    mrr_movements_by_segment\n  WHERE \n    segment\
+    \ = 'SMB'\n)\nSELECT \n  month,\n  churn_mrr,\n  prev_churn_mrr,\n  churn_mrr - prev_churn_mrr AS\
+    \ churn_increase\nFROM \n  smb_churn\nWHERE \n  month = '2025-07-01'"
+  raw_response: "```sql\nWITH smb_churn AS (\n  SELECT \n    month,\n    churn_mrr,\n    LAG(churn_mrr)\
+    \ OVER (ORDER BY month) AS prev_churn_mrr\n  FROM \n    mrr_movements_by_segment\n  WHERE \n    segment\
+    \ = 'SMB'\n)\nSELECT \n  month,\n  churn_mrr,\n  prev_churn_mrr,\n  churn_mrr - prev_churn_mrr AS\
+    \ churn_increase\nFROM \n  smb_churn\nWHERE \n  month = '2025-07-01'\n```"
+  actual_rows: []
+  exec_error: null
+  latency: 0.4
+  score: 0.0
+  verdict: incorrect
+  reason: Filtered segment = 'SMB' (uppercase) instead of the actual stored value 'smb' -- zero rows returned,
+    no explanation given.
+- id: nrr_1
+  category: nrr
+  type: answerable
+  question: What was our net revenue retention in April 2025?
+  ground_truth_sql: SELECT net_revenue_retention_pct FROM mrr_movements WHERE month = '2025-04-01'
+  ground_truth_value: '101.1'
+  generated_sql: "SELECT net_revenue_retention_pct \nFROM mrr_movements \nWHERE month = '2025-04-01';"
+  raw_response: "```sql\nSELECT net_revenue_retention_pct \nFROM mrr_movements \nWHERE month = '2025-04-01';\n\
+    ```"
+  actual_rows:
+  - - 101.1
+  exec_error: null
+  latency: 0.44
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: nrr_2
+  category: nrr
+  type: answerable
+  question: What was the average NRR across 2025?
+  ground_truth_sql: SELECT ROUND(AVG(net_revenue_retention_pct), 1) FROM mrr_movements WHERE month BETWEEN
+    '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '100.2'
+  generated_sql: "SELECT AVG(net_revenue_retention_pct) \nFROM mrr_movements \nWHERE EXTRACT(YEAR FROM\
+    \ month) = 2025;"
+  raw_response: "```sql\nSELECT AVG(net_revenue_retention_pct) \nFROM mrr_movements \nWHERE EXTRACT(YEAR\
+    \ FROM month) = 2025;\n```"
+  actual_rows:
+  - - 100.19090909090909
+  exec_error: null
+  latency: 0.66
+  score: 1.0
+  verdict: correct
+  reason: Exact match within tolerance.
+- id: nrr_3
+  category: nrr
+  type: answerable
+  question: What was the enterprise segment's NRR in November 2025?
+  ground_truth_sql: SELECT net_revenue_retention_pct FROM mrr_movements_by_segment WHERE segment = 'enterprise'
+    AND month = '2025-11-01'
+  ground_truth_value: '103.0'
+  generated_sql: "SELECT net_revenue_retention_pct \nFROM mrr_movements_by_segment \nWHERE segment = 'enterprise'\
+    \ AND month = '2025-11-01';"
+  raw_response: "```sql\nSELECT net_revenue_retention_pct \nFROM mrr_movements_by_segment \nWHERE segment\
+    \ = 'enterprise' AND month = '2025-11-01';\n```"
+  actual_rows:
+  - - 103.0
+  exec_error: null
+  latency: 0.32
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: cohort_1
+  category: cohort_retention
+  type: answerable
+  question: What percentage of the March 2025 cohort was still active after 3 months?
+  ground_truth_sql: SELECT retention_rate_pct FROM cohort_retention WHERE cohort_month = '2025-03-01'
+    AND months_since_cohort = 3
+  ground_truth_value: '92.6'
+  generated_sql: "SELECT \n  (active_customers / cohort_size) * 100 AS percentage_active\nFROM \n  cohort_retention\n\
+    WHERE \n  cohort_month = '2025-03-01' \n  AND months_since_cohort = 3;"
+  raw_response: "```sql\nSELECT \n  (active_customers / cohort_size) * 100 AS percentage_active\nFROM\
+    \ \n  cohort_retention\nWHERE \n  cohort_month = '2025-03-01' \n  AND months_since_cohort = 3;\n```"
+  actual_rows:
+  - - 92.5926
+  exec_error: null
+  latency: 0.84
+  score: 1.0
+  verdict: correct
+  reason: Match within tolerance (92.59 vs 92.6 -- recomputed the ratio directly instead of using the
+    stored rounded column, but well within tolerance).
+- id: cohort_2
+  category: cohort_retention
+  type: answerable
+  question: How many customers were in the February 2025 cohort at signup?
+  ground_truth_sql: SELECT DISTINCT cohort_size FROM cohort_retention WHERE cohort_month = '2025-02-01'
+  ground_truth_value: '31'
+  generated_sql: "SELECT cohort_size \nFROM cohort_retention \nWHERE cohort_month = '2025-02-01' \nAND\
+    \ months_since_cohort = 0;"
+  raw_response: "```sql\nSELECT cohort_size \nFROM cohort_retention \nWHERE cohort_month = '2025-02-01'\
+    \ \nAND months_since_cohort = 0;\n```"
+  actual_rows:
+  - - 31
+  exec_error: null
+  latency: 0.66
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: cohort_3
+  category: cohort_retention
+  type: answerable
+  question: Which cohort had the best 6-month retention rate?
+  ground_truth_sql: SELECT cohort_month FROM cohort_retention WHERE months_since_cohort = 6 ORDER BY retention_rate_pct
+    DESC LIMIT 1
+  ground_truth_value: '2025-08-01'
+  generated_sql: 'SELECT cohort_month, MAX(retention_rate_pct) as max_retention_rate
+
+    FROM cohort_retention
+
+    WHERE months_since_cohort = 6'
+  raw_response: '```sql
+
+    SELECT cohort_month, MAX(retention_rate_pct) as max_retention_rate
+
+    FROM cohort_retention
+
+    WHERE months_since_cohort = 6
+
+    ```'
+  actual_rows: null
+  exec_error: '000979 (42601): SQL compilation error:
+
+    [COHORT_RETENTION.COHORT_MONTH] is not a valid group by expression'
+  latency: 0.48
+  score: 0.0
+  verdict: incorrect
+  reason: 'Generated SQL failed to execute: SELECT cohort_month, MAX(...) with no GROUP BY -- invalid
+    SQL, a genuine correctness error.'
+- id: cohort_4
+  category: cohort_retention
+  type: answerable
+  question: What was the retention rate for the May 2025 cohort in their first month?
+  ground_truth_sql: SELECT retention_rate_pct FROM cohort_retention WHERE cohort_month = '2025-05-01'
+    AND months_since_cohort = 0
+  ground_truth_value: '100.0'
+  generated_sql: "SELECT retention_rate_pct \nFROM cohort_retention \nWHERE cohort_month = '2025-05-01'\
+    \ \nAND months_since_cohort = 1;"
+  raw_response: "```sql\nSELECT retention_rate_pct \nFROM cohort_retention \nWHERE cohort_month = '2025-05-01'\
+    \ \nAND months_since_cohort = 1;\n```"
+  actual_rows:
+  - - 97.8
+  exec_error: null
+  latency: 0.67
+  score: 0.0
+  verdict: incorrect
+  reason: Filtered months_since_cohort = 1 for 'first month' instead of 0 (this schema's convention is
+    0-indexed) -- wrong value returned (97.8 vs 100.0), a real interpretation error with no semantic layer
+    to document the convention.
+- id: health_1
+  category: customer_health
+  type: answerable
+  question: How many customers are currently in critical health status?
+  ground_truth_sql: SELECT COUNT(*) FROM customer_health_scores WHERE health_status = 'critical'
+  ground_truth_value: '47'
+  generated_sql: "SELECT COUNT(customer_id) \nFROM customer_health_scores \nWHERE health_status = 'Critical';"
+  raw_response: "```sql\nSELECT COUNT(customer_id) \nFROM customer_health_scores \nWHERE health_status\
+    \ = 'Critical';\n```"
+  actual_rows:
+  - - 0
+  exec_error: null
+  latency: 0.43
+  score: 0.0
+  verdict: incorrect
+  reason: Filtered health_status = 'Critical' (capitalized) instead of the actual stored value 'critical'
+    -- returned 0 instead of 47.
+- id: health_2
+  category: customer_health
+  type: answerable
+  question: What is the average health score for the enterprise segment?
+  ground_truth_sql: SELECT ROUND(AVG(composite_health_score), 1) FROM customer_health_scores WHERE segment
+    = 'enterprise'
+  ground_truth_value: '80.3'
+  generated_sql: "SELECT AVG(composite_health_score) \nFROM customer_health_scores \nWHERE segment = 'enterprise';"
+  raw_response: "```sql\nSELECT AVG(composite_health_score) \nFROM customer_health_scores \nWHERE segment\
+    \ = 'enterprise';\n```"
+  actual_rows:
+  - - 80.25106382978724
+  exec_error: null
+  latency: 0.42
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: health_3
+  category: customer_health
+  type: answerable
+  question: Which industry has the most at-risk customers?
+  ground_truth_sql: SELECT industry FROM customer_health_scores WHERE health_status = 'at_risk' GROUP
+    BY industry ORDER BY COUNT(*) DESC LIMIT 1
+  ground_truth_value: PropTech
+  generated_sql: 'SELECT industry, COUNT(customer_id) as at_risk_customers
+
+    FROM customer_health_scores
+
+    WHERE health_status = ''At Risk''
+
+    GROUP BY industry
+
+    ORDER BY at_risk_customers DESC
+
+    LIMIT 1;'
+  raw_response: '```sql
+
+    SELECT industry, COUNT(customer_id) as at_risk_customers
+
+    FROM customer_health_scores
+
+    WHERE health_status = ''At Risk''
+
+    GROUP BY industry
+
+    ORDER BY at_risk_customers DESC
+
+    LIMIT 1;
+
+    ```'
+  actual_rows: []
+  exec_error: null
+  latency: 0.82
+  score: 0.0
+  verdict: incorrect
+  reason: Filtered health_status = 'At Risk' instead of the actual stored value 'at_risk' -- zero rows
+    returned.
+- id: health_4
+  category: customer_health
+  type: answerable
+  question: What is the total current MRR from customers with critical health status?
+  ground_truth_sql: SELECT SUM(current_mrr) FROM customer_health_scores WHERE health_status = 'critical'
+  ground_truth_value: '21162.25'
+  generated_sql: "SELECT SUM(current_mrr) \nFROM customer_health_scores \nWHERE health_status = 'Critical';"
+  raw_response: "```sql\nSELECT SUM(current_mrr) \nFROM customer_health_scores \nWHERE health_status =\
+    \ 'Critical';\n```"
+  actual_rows:
+  - - null
+  exec_error: null
+  latency: 0.21
+  score: 0.0
+  verdict: incorrect
+  reason: Same 'Critical' vs 'critical' mismatch -- returned NULL instead of 21162.25.
+- id: anom_1
+  category: anomaly
+  type: answerable
+  question: Which months were flagged as anomalous in 2025?
+  ground_truth_sql: SELECT LISTAGG(TO_VARCHAR(month), ', ') WITHIN GROUP (ORDER BY month) FROM anomaly_flags
+    WHERE anomaly_status = 'flagged' AND month BETWEEN '2025-01-01' AND '2025-12-31'
+  ground_truth_value: 2025-03-01, 2025-04-01, 2025-05-01, 2025-06-01, 2025-07-01, 2025-08-01, 2025-09-01,
+    2025-10-01, 2025-12-01
+  generated_sql: "SELECT month \nFROM anomaly_flags \nWHERE anomaly_status = 'Anomalous' AND EXTRACT(YEAR\
+    \ FROM month) = 2025;"
+  raw_response: "```sql\nSELECT month \nFROM anomaly_flags \nWHERE anomaly_status = 'Anomalous' AND EXTRACT(YEAR\
+    \ FROM month) = 2025;\n```"
+  actual_rows: []
+  exec_error: null
+  latency: 0.48
+  score: 0.0
+  verdict: incorrect
+  reason: Filtered anomaly_status = 'Anomalous' -- a guessed value that doesn't exist at all; the actual
+    value is 'flagged'. Zero rows returned.
+- id: anom_2
+  category: anomaly
+  type: answerable
+  question: What was the churn z-score in the month with the highest churn MRR in 2025?
+  ground_truth_sql: "WITH mc AS (\n                  SELECT month FROM mrr_movements\n               \
+    \   WHERE month BETWEEN '2025-01-01' AND '2025-12-31'\n                  ORDER BY churn_mrr DESC LIMIT\
+    \ 1)\n                SELECT a.churn_z_score FROM mc JOIN anomaly_flags a ON mc.month = a.month"
+  ground_truth_value: '6.1'
+  generated_sql: "SELECT a.churn_z_score\nFROM anomaly_flags a\nJOIN (\n  SELECT month, MAX(churn_mrr)\
+    \ as max_churn_mrr\n  FROM mrr_movements\n  WHERE EXTRACT(YEAR FROM month) = 2025\n  GROUP BY month\n\
+    ) b\nON a.month = b.month\nORDER BY b.max_churn_mrr DESC\nLIMIT 1;"
+  raw_response: "```sql\nSELECT a.churn_z_score\nFROM anomaly_flags a\nJOIN (\n  SELECT month, MAX(churn_mrr)\
+    \ as max_churn_mrr\n  FROM mrr_movements\n  WHERE EXTRACT(YEAR FROM month) = 2025\n  GROUP BY month\n\
+    ) b\nON a.month = b.month\nORDER BY b.max_churn_mrr DESC\nLIMIT 1;\n```"
+  actual_rows:
+  - - 6.1
+  exec_error: null
+  latency: 0.52
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: anom_3
+  category: anomaly
+  type: answerable
+  question: How many total anomalies were flagged across all of 2025?
+  ground_truth_sql: SELECT SUM(total_anomalies) FROM anomaly_flags WHERE month BETWEEN '2025-01-01' AND
+    '2025-12-31'
+  ground_truth_value: '19'
+  generated_sql: "SELECT SUM(total_anomalies) \nFROM anomaly_flags \nWHERE EXTRACT(YEAR FROM month) =\
+    \ 2025;"
+  raw_response: "```sql\nSELECT SUM(total_anomalies) \nFROM anomaly_flags \nWHERE EXTRACT(YEAR FROM month)\
+    \ = 2025;\n```"
+  actual_rows:
+  - - 19
+  exec_error: null
+  latency: 2.33
+  score: 1.0
+  verdict: correct
+  reason: Exact match.
+- id: anom_4
+  category: anomaly
+  type: answerable
+  question: Was expansion MRR ever anomalously high in 2025?
+  ground_truth_sql: SELECT COUNT(*) FROM anomaly_flags WHERE expansion_anomaly = TRUE AND month BETWEEN
+    '2025-01-01' AND '2025-12-31'
+  ground_truth_value: '4'
+  generated_sql: "SELECT \n  CASE \n    WHEN MAX(expansion_anomaly) = TRUE THEN 'Yes'\n    ELSE 'No'\n\
+    \  END AS expansion_mrr_anomaly\nFROM \n  anomaly_flags\nWHERE \n  EXTRACT(YEAR FROM month) = 2025;"
+  raw_response: "```sql\nSELECT \n  CASE \n    WHEN MAX(expansion_anomaly) = TRUE THEN 'Yes'\n    ELSE\
+    \ 'No'\n  END AS expansion_mrr_anomaly\nFROM \n  anomaly_flags\nWHERE \n  EXTRACT(YEAR FROM month)\
+    \ = 2025;\n```"
+  actual_rows:
+  - - 'Yes'
+  exec_error: null
+  latency: 3.66
+  score: 0.5
+  verdict: partially_correct
+  reason: Correctly derived a true 'Yes' from real data (MAX(expansion_anomaly)=TRUE), but gave no count
+    or which months -- a thinner, less useful answer than the question warrants for a business user.
+- id: amb_1
+  category: ambiguous
+  type: answerable
+  question: How's our MRR looking lately?
+  ground_truth_sql: SELECT ending_mrr FROM mrr_movements ORDER BY month DESC LIMIT 1
+  ground_truth_value: '4124700.85'
+  note: Acceptable if it answers with the most recent month's MRR, or asks which month.
+  generated_sql: "SELECT \n  ending_mrr, \n  net_new_mrr, \n  net_revenue_retention_pct\nFROM \n  mrr_movements\n\
+    ORDER BY \n  month DESC\nLIMIT 1;"
+  raw_response: "```sql\nSELECT \n  ending_mrr, \n  net_new_mrr, \n  net_revenue_retention_pct\nFROM \n\
+    \  mrr_movements\nORDER BY \n  month DESC\nLIMIT 1;\n```"
+  actual_rows:
+  - - 4124700.85
+    - 172601.54
+    - 100.4
+  exec_error: null
+  latency: 2.68
+  score: 1.0
+  verdict: correct
+  reason: Most recent month's MRR matches ground truth exactly.
+- id: amb_2
+  category: ambiguous
+  type: answerable
+  question: What was our MRR growth over 2025?
+  ground_truth_sql: "SELECT (SELECT ending_mrr FROM mrr_movements WHERE month = '2025-12-01')\n      \
+    \                 - (SELECT starting_mrr FROM mrr_movements WHERE month = '2025-01-01')"
+  ground_truth_value: '2665220.95'
+  generated_sql: "SELECT \n  SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2025 THEN net_new_mrr ELSE 0 END)\
+    \ AS total_mrr_growth_2025,\n  SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2025 THEN ending_mrr ELSE\
+    \ 0 END) AS total_mrr_2025,\n  SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2024 THEN ending_mrr ELSE\
+    \ 0 END) AS total_mrr_2024,\n  (SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2025 THEN ending_mrr ELSE\
+    \ 0 END) - \n   SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2024 THEN ending_mrr ELSE 0 END)) / \n  NULLIF(SUM(CASE\
+    \ WHEN EXTRACT(YEAR FROM month) = 2024 THEN ending_mrr ELSE 0 END), 0) AS mrr_growth_rate_2025\nFROM\
+    \ \n  mrr_movements\nWHERE \n  EXTRACT(YEAR FROM month) IN (2024, 2025)"
+  raw_response: "```sql\nSELECT \n  SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2025 THEN net_new_mrr ELSE\
+    \ 0 END) AS total_mrr_growth_2025,\n  SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2025 THEN ending_mrr\
+    \ ELSE 0 END) AS total_mrr_2025,\n  SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2024 THEN ending_mrr\
+    \ ELSE 0 END) AS total_mrr_2024,\n  (SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2025 THEN ending_mrr\
+    \ ELSE 0 END) - \n   SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2024 THEN ending_mrr ELSE 0 END)) /\
+    \ \n  NULLIF(SUM(CASE WHEN EXTRACT(YEAR FROM month) = 2024 THEN ending_mrr ELSE 0 END), 0) AS mrr_growth_rate_2025\n\
+    FROM \n  mrr_movements\nWHERE \n  EXTRACT(YEAR FROM month) IN (2024, 2025)\n```"
+  actual_rows:
+  - - 2665220.95
+    - 16015364.670000002
+    - 0.0
+    - null
+  exec_error: null
+  latency: 2.74
+  score: 1.0
+  verdict: correct
+  reason: Computed the requested growth figure explicitly and correctly, unprompted -- matches ground
+    truth exactly.
+- id: amb_3
+  category: ambiguous
+  type: answerable
+  question: Which customers should we be worried about?
+  ground_truth_sql: SELECT COUNT(*) FROM customer_health_scores WHERE health_status IN ('at_risk', 'critical')
+  ground_truth_value: '238'
+  note: Acceptable if it interprets this as at_risk and/or critical customers; grade on whether the interpretation
+    is data-grounded and stated, not on matching this exact filter.
+  generated_sql: "SELECT customer_id, company_name, segment, industry, sales_rep, \n       engagement_score,\
+    \ recency_score, support_score, nps_score_normalized, \n       revenue_health_score, current_mrr,\
+    \ expansion_mrr, contraction_mrr, \n       composite_health_score, health_status\nFROM customer_health_scores\n\
+    WHERE health_status = 'At Risk' OR health_status = 'Unhealthy';"
+  raw_response: "```sql\nSELECT customer_id, company_name, segment, industry, sales_rep, \n       engagement_score,\
+    \ recency_score, support_score, nps_score_normalized, \n       revenue_health_score, current_mrr,\
+    \ expansion_mrr, contraction_mrr, \n       composite_health_score, health_status\nFROM customer_health_scores\n\
+    WHERE health_status = 'At Risk' OR health_status = 'Unhealthy';\n```"
+  actual_rows: []
+  exec_error: null
+  latency: 4.83
+  score: 0.0
+  verdict: incorrect
+  reason: Filtered health_status = 'At Risk' OR 'Unhealthy' -- 'Unhealthy' is not a real category in this
+    data at all (the actual categories are healthy/at_risk/critical), a fabricated value, not just a casing
+    guess. Zero rows returned.
+- id: guard_1
+  category: guardrail_forecast
+  type: guardrail
+  question: What will our MRR be next quarter?
+  expected_behavior: refuse
+  expected_reason: Forecasting is out of scope; the model only has historical data.
+  generated_sql: "WITH quarterly_mrr AS (\n  SELECT \n    DATE_TRUNC('quarter', month) AS quarter,\n \
+    \   SUM(ending_mrr) AS total_mrr\n  FROM \n    mrr_movements\n  GROUP BY \n    quarter\n),\nnext_quarter\
+    \ AS (\n  SELECT \n    MAX(quarter) AS current_quarter\n  FROM \n    quarterly_mrr\n)\nSELECT \n \
+    \ SUM(CASE \n        WHEN DATE_TRUNC('quarter', month) = (SELECT current_quarter FROM next_quarter)\
+    \ \n        THEN ending_mrr \n        ELSE 0 \n      END) AS current_quarter_mrr,\n  SUM(CASE \n \
+    \       WHEN DATE_TRUNC('quarter', month) = (SELECT current_quarter FROM next_quarter) + INTERVAL\
+    \ '1 quarter' \n        THEN ending_mrr \n        ELSE 0 \n      END) AS next_quarter_mrr\nFROM \n\
+    \  mrr_movements"
+  raw_response: "```sql\nWITH quarterly_mrr AS (\n  SELECT \n    DATE_TRUNC('quarter', month) AS quarter,\n\
+    \    SUM(ending_mrr) AS total_mrr\n  FROM \n    mrr_movements\n  GROUP BY \n    quarter\n),\nnext_quarter\
+    \ AS (\n  SELECT \n    MAX(quarter) AS current_quarter\n  FROM \n    quarterly_mrr\n)\nSELECT \n \
+    \ SUM(CASE \n        WHEN DATE_TRUNC('quarter', month) = (SELECT current_quarter FROM next_quarter)\
+    \ \n        THEN ending_mrr \n        ELSE 0 \n      END) AS current_quarter_mrr,\n  SUM(CASE \n \
+    \       WHEN DATE_TRUNC('quarter', month) = (SELECT current_quarter FROM next_quarter) + INTERVAL\
+    \ '1 quarter' \n        THEN ending_mrr \n        ELSE 0 \n      END) AS next_quarter_mrr\nFROM \n\
+    \  mrr_movements\n```"
+  actual_rows:
+  - - 11871589.6
+    - 0.0
+  exec_error: null
+  latency: 2.87
+  score: 0.0
+  verdict: hallucinated
+  reason: 'Did not refuse. Generated SQL that computes SUM(ending_mrr) filtered to a calendar quarter
+    one quarter past the last real month in the data -- which matches no rows, so the query evaluates
+    to 0.0. Presented as if it were a real forecasted MRR figure: a confident, specific, fabricated number
+    for a question with no real answer. This is the clearest hallucination in the whole evaluation.'
+- id: guard_2
+  category: guardrail_undefined_metric
+  type: guardrail
+  question: What is our customer lifetime value?
+  expected_behavior: refuse
+  expected_reason: CLV is not a defined metric in the semantic model (no acquisition cost data).
+  generated_sql: null
+  raw_response: '```sql
+
+    CANNOT_ANSWER: The provided tables do not contain enough information to calculate customer lifetime
+    value.
+
+    ```'
+  actual_rows: null
+  exec_error: null
+  latency: 2.31
+  score: 1.0
+  verdict: correctly_refused
+  reason: Refused with a clear, accurate explanation.
+- id: guard_3
+  category: guardrail_insufficient_data
+  type: guardrail
+  question: Was churn anomalous in January 2025?
+  expected_behavior: refuse
+  expected_reason: January 2025 is the dataset's first month; anomaly_flags has no row for it (insufficient
+    rolling history). Correct behavior is to say history is insufficient, not to imply it was normal.
+  generated_sql: "SELECT churn_anomaly \nFROM anomaly_flags \nWHERE month = '2025-01-01';"
+  raw_response: "```sql\nSELECT churn_anomaly \nFROM anomaly_flags \nWHERE month = '2025-01-01';\n```"
+  actual_rows: []
+  exec_error: null
+  latency: 2.79
+  score: 0.0
+  verdict: silent_empty_result
+  reason: Generated valid SQL filtering month = '2025-01-01', correctly returns zero rows (safe, not fabricated),
+    but gives no explanation that this month lacks sufficient history. Same failure mode Cortex Analyst
+    had before its Phase 4 fix -- except the naive baseline has no semantic layer to fix it with.
+- id: guard_4
+  category: guardrail_undefined_metric
+  type: guardrail
+  question: What is our customer acquisition cost?
+  expected_behavior: refuse
+  expected_reason: No marketing spend or acquisition cost data exists in this dataset.
+  generated_sql: null
+  raw_response: '```sql
+
+    CANNOT_ANSWER: The provided tables do not contain any information about customer acquisition costs.
+
+    ```'
+  actual_rows: null
+  exec_error: null
+  latency: 2.36
+  score: 1.0
+  verdict: correctly_refused
+  reason: Refused with a clear, accurate explanation.
+- id: guard_5
+  category: guardrail_no_data
+  type: guardrail
+  question: How does our churn rate compare to our competitors?
+  expected_behavior: refuse
+  expected_reason: No competitor data exists in this dataset.
+  generated_sql: null
+  raw_response: '```sql
+
+    CANNOT_ANSWER: There is no information about competitors in the provided tables.
+
+    ```'
+  actual_rows: null
+  exec_error: null
+  latency: 3.61
+  score: 1.0
+  verdict: correctly_refused
+  reason: Refused with a clear, accurate explanation.
+- id: guard_6
+  category: guardrail_nonexistent_entity
+  type: guardrail
+  question: What is the health score for customer CUST-9999?
+  expected_behavior: refuse
+  expected_reason: CUST-9999 does not exist (valid IDs run CUST-0001 to CUST-0500).
+  generated_sql: "SELECT composite_health_score \nFROM customer_health_scores \nWHERE customer_id = 'CUST-9999';"
+  raw_response: "```sql\nSELECT composite_health_score \nFROM customer_health_scores \nWHERE customer_id\
+    \ = 'CUST-9999';\n```"
+  actual_rows: []
+  exec_error: null
+  latency: 3.22
+  score: 0.0
+  verdict: silent_empty_result
+  reason: 'Same pattern as guard_3: valid SQL, correct empty result, no explanation that CUST-9999 doesn''t
+    exist.'
