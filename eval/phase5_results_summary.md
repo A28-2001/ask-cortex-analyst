@@ -116,6 +116,48 @@ initially got wrong before its own fix). General arithmetic and
 straightforward single-table queries are not where this baseline
 struggles; enum-value grounding and business-convention knowledge are.
 
+## Run-to-run stability check
+
+The parsing-bug fix required re-running the baseline a second time,
+which gave an unplanned but useful check: comparing the two independent
+runs (both `temperature=0`) shows 12 of 36 questions produced genuinely
+different generated SQL between runs, and two flipped outcome entirely
+— `cohort_3` was correct in the first run and failed in the second
+(a `GROUP BY` error); `amb_2` failed in the first run (a broken
+self-referential subquery returning `NULL`) and was correct in the
+second. `temperature=0` reduces but does not eliminate variance in this
+model's SQL generation.
+
+This means 65.3% should be read as one sample from a distribution, not
+an exact fixed number — a third run would likely land in a similar
+range but not hit exactly 65.3% again. What *did* reproduce exactly
+across both runs: the `guard_1` hallucination (byte-for-byte identical
+SQL both times) and the dominant enum-guessing failure pattern (present
+in both runs, even where the specific wrong guess differed). The
+qualitative finding is robust; the precise percentage carries some
+sampling noise that a single 36-question run can't rule out.
+
+## A fairness note on the comparison
+
+The final Cortex Analyst number (100%) reflects three rounds of
+diagnosis and fixing on this exact question set, validated afterward
+on a separate blind holdout. The baseline number (65.3%) reflects one
+(now two, for stability-checking) cold pass with zero iteration, by
+design. The most apples-to-apples *single-pass* comparison is baseline
+65.3% vs. Cortex Analyst's original v1 pass at 93.1% — which still
+shows a large gap before any tuning on either side. The gap to the
+final 100% reflects the added value of iteration on top of grounding,
+not grounding alone. Both framings are legitimate; conflating them
+would overstate the case.
+
+Also worth naming as a scope limit: this tests one baseline model
+(`llama-3.3-70b-versatile`) with one minimal prompt. A different
+off-the-shelf model, or a hand-engineered prompt that reinvents parts
+of a semantic layer (documenting valid values, adding refusal rules),
+could plausibly score higher — this result shows what a realistic,
+minimal-effort naive setup gets you, not the ceiling of what prompting
+alone could achieve with enough manual effort.
+
 ## Bottom line
 
 On real business questions, semantic grounding took accuracy from
@@ -125,4 +167,6 @@ concrete and traceable, not abstract: documented valid values prevent
 silently wrong filters, documented conventions prevent misinterpreted
 column semantics, and explicit refusal instructions prevent a
 forecasting question from being quietly answered with a fabricated
-zero.
+zero. The headline hallucination and the dominant failure pattern both
+reproduced across independent runs; the exact accuracy percentage
+carries normal single-sample noise on top of that.
