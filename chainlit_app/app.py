@@ -52,21 +52,36 @@ def execute_sql(sql: str):
         return columns, rows
 
 
-@cl.set_starters
-async def starters():
+@cl.set_starter_categories
+async def starter_categories():
     return [
-        cl.Starter(label="What was our total MRR in June 2026?", message="What was our total MRR in June 2026?"),
-        cl.Starter(label="How much new MRR did we add in the first half of 2025?", message="How much new MRR did we add in the first half of 2025?"),
-        cl.Starter(label="What drove the SMB revenue trend in Q3 2025?", message="What drove the SMB revenue trend in Q3 2025?"),
-        cl.Starter(label="What was our NRR for the SMB segment in October 2025?", message="What was our NRR for the SMB segment in October 2025?"),
-        cl.Starter(label="How did the June 2025 cohort retain after 4 months?", message="How did the June 2025 cohort retain after 4 months?"),
-        cl.Starter(label="What was our MRR growth in Q1 2026?", message="What was our MRR growth in Q1 2026?"),
-        cl.Starter(label="Which customers are at risk?", message="Which customers are at risk?"),
-        cl.Starter(label="Which segment had the highest churn MRR in 2025?", message="Which segment had the highest churn MRR in 2025?"),
-        cl.Starter(label="Was churn anomalous in January 2025?", message="Was churn anomalous in January 2025?"),
-        cl.Starter(label="What is the health score for customer CUST-0777?", message="What is the health score for customer CUST-0777?"),
-        cl.Starter(label="What is our gross margin?", message="What is our gross margin?"),
-        cl.Starter(label="Can you forecast our MRR for next quarter?", message="Can you forecast our MRR for next quarter?"),
+        cl.StarterCategory(
+            label="Revenue and growth",
+            starters=[
+                cl.Starter(label="What was our total MRR in June 2026?", message="What was our total MRR in June 2026?"),
+                cl.Starter(label="How much new MRR did we add in the first half of 2025?", message="How much new MRR did we add in the first half of 2025?"),
+                cl.Starter(label="What was our MRR growth in Q1 2026?", message="What was our MRR growth in Q1 2026?"),
+                cl.Starter(label="What was our NRR for the SMB segment in October 2025?", message="What was our NRR for the SMB segment in October 2025?"),
+            ],
+        ),
+        cl.StarterCategory(
+            label="Customers and segments",
+            starters=[
+                cl.Starter(label="Which customers are at risk?", message="Which customers are at risk?"),
+                cl.Starter(label="How did the June 2025 cohort retain after 4 months?", message="How did the June 2025 cohort retain after 4 months?"),
+                cl.Starter(label="What drove the SMB revenue trend in Q3 2025?", message="What drove the SMB revenue trend in Q3 2025?"),
+                cl.Starter(label="Which segment had the highest churn MRR in 2025?", message="Which segment had the highest churn MRR in 2025?"),
+            ],
+        ),
+        cl.StarterCategory(
+            label="Guardrail checks",
+            starters=[
+                cl.Starter(label="Was churn anomalous in January 2025?", message="Was churn anomalous in January 2025?"),
+                cl.Starter(label="What is the health score for customer CUST-0777?", message="What is the health score for customer CUST-0777?"),
+                cl.Starter(label="What is our gross margin?", message="What is our gross margin?"),
+                cl.Starter(label="Can you forecast our MRR for next quarter?", message="Can you forecast our MRR for next quarter?"),
+            ],
+        ),
     ]
 
 
