@@ -128,7 +128,7 @@ The first pass above was a live spot-check on 2 questions plus 3
 regression checks, not a full re-run — worth being precise about that
 distinction, since the number that ends up in a resume bullet should be
 one I actually measured, not one I inferred. Archived the v1 raw results
-(`cortex_analyst_results_v1.yaml`) and re-ran all 36 questions fresh
+(`archive/cortex_analyst_results_v1.yaml`) and re-ran all 36 questions fresh
 after both fixes:
 
 | Metric | v1 | v2 (full re-run) |
