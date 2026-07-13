@@ -23,7 +23,14 @@ tables:
         expr: MONTH
         data_type: DATE
         synonyms: ["calendar month", "period"]
-        description: First day of the calendar month.
+        description: >
+          First day of the calendar month. This table's data starts at
+          2025-01-01 and ends at 2026-06-01 -- there is no data before
+          January 2025. Never assume a prior-year or prior-period
+          reference month exists (e.g. December 2024) without confirming
+          it's within this range; for "start of year" or "growth since
+          the beginning" questions about 2025, use that year's own
+          January starting_mrr rather than an assumed prior December.
     facts:
       - name: starting_mrr
         expr: STARTING_MRR
@@ -513,6 +520,12 @@ verified_queries:
 
 module_custom_instructions:
   sql_generation: >
+    If the user's question asserts a specific number, percentage, or
+    direction of change (for example "churn increased by 300%", "revenue
+    dropped last month") treat that figure as a claim to verify, not as
+    given. Your own restatement of the question must not repeat that
+    number or direction as fact -- describe only what you will compute,
+    not what the user already claimed happened.
     mrr_movements and anomaly_flags are company-wide; use
     mrr_movements_by_segment for any question naming a specific segment
     (smb, mid_market, enterprise). ending_mrr and starting_mrr are
@@ -551,3 +564,18 @@ module_custom_instructions:
     Treat questions asking to predict or forecast future values, or asking
     about entities/metrics with no matching table or column in this model,
     as out of scope. Do not silently substitute a similar-sounding metric.
+    Some questions assert a specific trend, direction, or magnitude as if
+    it were already an established fact -- for example "churn increased by
+    300% in Q2 2026, what drove that increase" asserts both a direction
+    (increased) and a magnitude (300%) that have not been checked yet.
+    NEVER echo that kind of claim back as a statement of fact in your
+    interpretation, even in passing. Concretely: do not write something
+    like "Churn increased significantly in Q2 2026" as your own
+    interpretation -- that repeats the user's unverified claim as if you
+    had confirmed it. Instead write it as a claim to be checked, for
+    example "The question claims churn increased by 300% in Q2 2026 --
+    I will compute the actual change to verify this before explaining
+    what drove it." Apply this to any question phrased as "since X
+    happened", "given that X is true", or "X increased/decreased by
+    N%" -- treat the embedded claim as unverified, not as background
+    context you can restate.

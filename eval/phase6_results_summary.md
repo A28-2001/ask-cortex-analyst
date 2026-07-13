@@ -102,3 +102,53 @@ data was actually checked. Different severity, same underlying lesson:
 the system that stayed inside its own guardrails did so because those
 guardrails were explicit and documented, not because the underlying
 model is inherently more careful.
+
+## Fixing the s8 inconsistency: three attempts, and what actually worked
+
+Took three tries to fix, worth documenting honestly since it's a real
+data point on how semantic-model instructions behave, not just a clean
+success story:
+
+1. **First attempt** — added guidance to `question_categorization`
+   telling the model not to restate unverified claims as fact. Re-tested
+   `s8` live: **no change**, identical flat restatement.
+2. **Second attempt** — made the same instruction much more specific and
+   forceful, with an explicit negative example matching the exact
+   observed failure text. Re-tested: **still no change**, byte-for-byte
+   identical response.
+3. **Third attempt** — moved a shorter version of the same guidance to
+   the very start of `sql_generation` (where the other successful Phase
+   4 fixes lived) instead of `question_categorization`. Re-tested:
+   **worked** — the interpretation text changed to *"The user claims
+   churn increased by 300% in Q2 2026. Rather than treating that as
+   fact, I will verify..."*
+
+Placement and section within the instruction block mattered more than
+the precision of the wording. Worth remembering for any future
+semantic-model instruction work: if a fix doesn't take on the first
+try, don't assume the content is wrong before trying a different
+location in the instruction block.
+
+## Full re-verification after the fix
+
+Re-ran the complete 8-question stress test and the full 36-question
+benchmark from Phase 4/5 after this change (not a spot-check this time,
+per the same standard as Phase 4's v2). One new issue surfaced during
+that re-run, unrelated to the s8 fix itself: `amb_2` ("MRR growth over
+2025") failed on this pass because the model assumed a `2024-12-01` row
+existed as a "prior year-end" baseline -- it doesn't, since this
+dataset starts January 2025. Comparing against the archived pre-fix
+run confirmed this was a different query strategy on this specific run
+(the earlier run safely used January 2025's own `starting_mrr` instead),
+not something caused by the s8 fix. Fixed by explicitly documenting the
+dataset's actual date range (2025-01-01 to 2026-06-01) in the semantic
+model, re-tested live, then re-ran everything fully clean once more.
+
+**Final validated results after all fixes:**
+
+| Suite | Score |
+|---|---|
+| Stress test (this phase) | **8/8 (100%)** |
+| Main 36-question benchmark (Phase 4/5) | **36/36 (100%)** |
+
+Both fully re-executed end to end, not extrapolated.
