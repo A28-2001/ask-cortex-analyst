@@ -106,7 +106,7 @@
     display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);
     background:var(--bg-raised);
   }
-  .demo-bar span{width:9px;height:9px;border-radius:50%;background:var(--line-strong);}
+  .demo-bar span:not(.demo-bar-label){width:9px;height:9px;border-radius:50%;background:var(--line-strong);flex-shrink:0;}
   .demo-bar-label{
     margin-left:8px;font-family:var(--mono);font-size:11px;color:var(--ink-faint);
     letter-spacing:0.04em;
