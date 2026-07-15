@@ -252,8 +252,17 @@
   .board-row .val.neutral{color:var(--ink);}
   .board-foot{padding:14px 20px;font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);background:var(--bg-inset);}
   .scroll-x{overflow-x:auto;}
+  /* On phones, keep both comparison columns visible instead of pushing the
+     Naive baseline column off-screen behind a horizontal scroll -- the whole
+     point of this table is the side-by-side contrast. */
   @media (max-width:600px){
-    .board{min-width:520px;}
+    .board-head div, .board-row div{padding:12px 9px;}
+    .board-head div{font-size:9.5px;letter-spacing:0.03em;}
+    .board-head .col-grounded, .board-head .col-naive{gap:5px;}
+    .board-head .dot{flex-shrink:0;}
+    .board-row .metric{font-size:11.5px;}
+    .board-row .val{font-size:13px;}
+    .board-foot{padding:12px 10px;font-size:10.5px;}
   }
 
   .pullquote{
