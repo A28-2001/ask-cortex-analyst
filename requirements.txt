@@ -14,3 +14,4 @@ requests==2.34.2
 cryptography==49.0.0
 pillow==12.3.0
 matplotlib==3.10.0
+pytest==9.1.1

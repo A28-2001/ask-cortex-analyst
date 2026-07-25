@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ask Cortex Analyst: 100% vs 65.3%</title>
+<meta name="description" content="Two systems, one warehouse, 44 identical questions. One had a documented semantic model. The other invented an $18,751,095.92 forecast." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ask-cortex-analyst.onrender.com/" />
+<meta property="og:title" content="One of these systems invented $18,751,095.92" />
+<meta property="og:description" content="Two systems, one warehouse, 44 identical questions. Grounded: 100% accurate, 0% fabrication. Ungrounded: 65.3% accurate, 16.7% fabrication." />
+<meta property="og:image" content="https://ask-cortex-analyst.onrender.com/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="One of these systems invented $18,751,095.92" />
+<meta name="twitter:description" content="Two systems, one warehouse, 44 identical questions. Grounded: 100% accurate, 0% fabrication. Ungrounded: 65.3% accurate, 16.7% fabrication." />
+<meta name="twitter:image" content="https://ask-cortex-analyst.onrender.com/og-image.png" />
+<style>
+  :root{
+    --black:#000000;
+    --white:#FFFFFF;
+    --signal:#FF3300;
+    --grey:#6E6E6E;
+    --grey-2:#B4B4B4;
+
+    --sans:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "Arial Black", Arial, sans-serif;
+    --mono:ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+    /* Committed single visual world: unmodulated black and white. */
+    color-scheme: light;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--white);
+    color:var(--black);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--signal);color:var(--white);}
+  a{color:inherit;}
+  h1,h2,h3{margin:0;font-weight:800;letter-spacing:-0.035em;line-height:0.92;text-wrap:balance;}
+  p{margin:0;}
+  .tnum{font-variant-numeric:tabular-nums;}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px;}
+
+  .lbl{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:400;
+    letter-spacing:0.13em;
+    text-transform:uppercase;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    border-bottom:2px solid var(--black);
+    padding:13px 0;
+  }
+  .topbar .wrap{display:flex;flex-wrap:wrap;gap:8px 26px;align-items:baseline;justify-content:space-between;}
+  .topbar .who{font-weight:800;letter-spacing:-0.02em;font-size:15px;}
+  .topbar nav{display:flex;flex-wrap:wrap;gap:8px 22px;}
+  .topbar nav a{text-decoration:none;}
+  .topbar nav a:hover{color:var(--signal);}
+
+  /* ---------- hero ---------- */
+  .hero{padding:58px 0 44px;border-bottom:2px solid var(--black);}
+  .hero .kicker{color:var(--signal);margin-bottom:26px;}
+  h1{
+    font-size:clamp(42px,8.6vw,124px);
+    max-width:16ch;
+  }
+  h1 .amt{
+    color:var(--signal);
+    display:inline-block;
+    white-space:nowrap;
+  }
+  .hero-sub{
+    margin-top:30px;
+    max-width:56ch;
+    font-size:clamp(16px,1.7vw,20px);
+    line-height:1.4;
+    color:var(--black);
+  }
+  .hero-sub b{font-weight:800;}
+
+  /* ---------- scoreboard ---------- */
+  .board{border-bottom:2px solid var(--black);}
+  .board-head{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    border-bottom:1px solid var(--black);
+  }
+  .board-head div{padding:12px 0 11px;}
+  .board-head div + div{border-left:1px solid var(--black);padding-left:22px;}
+  .board-head .a{color:var(--black);}
+  .board-head .b{color:var(--signal);}
+
+  .board-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    border-bottom:1px solid var(--black);
+  }
+  .board-row:last-child{border-bottom:none;}
+  .board-cell{padding:26px 0 30px;}
+  .board-cell + .board-cell{border-left:1px solid var(--black);padding-left:22px;}
+  .metric{margin-bottom:10px;color:var(--grey);}
+  /* On desktop the column headers carry the system names. When the board
+     stacks on mobile those headers orphan, so each cell names its own system. */
+  .sys-tag{display:none;}
+  .sys-tag.b{color:var(--signal);}
+  .fig{
+    font-size:clamp(52px,10.4vw,148px);
+    font-weight:800;
+    letter-spacing:-0.05em;
+    line-height:0.82;
+    font-variant-numeric:tabular-nums;
+  }
+  .fig.bad{color:var(--signal);}
+  .caption{margin-top:12px;font-size:15px;color:var(--grey);max-width:34ch;line-height:1.35;}
+
+  /* ---------- call to action ---------- */
+  .cta{
+    border-bottom:2px solid var(--black);
+    padding:26px 0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:center;
+  }
+  .btn{
+    display:inline-block;
+    background:var(--black);
+    color:var(--white);
+    text-decoration:none;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.13em;
+    text-transform:uppercase;
+    padding:16px 26px;
+    border:2px solid var(--black);
+  }
+  .btn:hover{background:var(--signal);border-color:var(--signal);color:var(--white);}
+  .btn.ghost{background:var(--white);color:var(--black);}
+  .btn.ghost:hover{background:var(--black);color:var(--white);border-color:var(--black);}
+  .cta .fine{font-size:14px;color:var(--grey);}
+
+  /* ---------- inverted exhibit ---------- */
+  .invert{
+    background:var(--black);
+    color:var(--white);
+    padding:64px 0 70px;
+  }
+  .invert h2{font-size:clamp(30px,4.6vw,62px);max-width:20ch;}
+  .invert .kicker{color:var(--signal);margin-bottom:22px;}
+  .invert .intro{margin-top:24px;max-width:56ch;font-size:17px;line-height:1.5;color:var(--grey-2);}
+  .prompt{
+    margin-top:46px;
+    border-top:1px solid var(--white);
+    border-bottom:1px solid var(--white);
+    padding:20px 0;
+  }
+  .prompt .lbl{color:var(--grey-2);display:block;margin-bottom:8px;}
+  .prompt .q{font-size:clamp(18px,2.4vw,27px);font-weight:800;letter-spacing:-0.02em;line-height:1.2;}
+  .versus{display:grid;grid-template-columns:1fr 1fr;}
+  .versus > div{padding:28px 26px 30px 0;}
+  .versus > div + div{border-left:1px solid var(--white);padding:28px 0 30px 26px;}
+  .vs-lbl{display:block;margin-bottom:16px;}
+  .vs-a .vs-lbl{color:var(--signal);}
+  .vs-b .vs-lbl{color:var(--white);}
+  .sql{
+    font-family:var(--mono);
+    font-size:12.5px;
+    line-height:1.6;
+    color:var(--grey-2);
+    white-space:pre-wrap;
+    margin-bottom:20px;
+  }
+  .out-bad{
+    font-family:var(--mono);
+    font-variant-numeric:tabular-nums;
+    font-size:clamp(21px,3vw,38px);
+    font-weight:700;
+    color:var(--signal);
+    letter-spacing:-0.02em;
+    line-height:1.1;
+  }
+  .out-good{font-size:17px;line-height:1.5;color:var(--white);}
+  .verdict{
+    margin-top:16px;
+    font-size:15px;
+    line-height:1.45;
+    color:var(--grey-2);
+    max-width:36ch;
+  }
+  .verdict b{color:var(--signal);font-weight:800;}
+
+  /* ---------- generic section ---------- */
+  section.blk{padding:62px 0;border-bottom:2px solid var(--black);}
+  section.blk .kicker{color:var(--signal);margin-bottom:20px;}
+  h2{font-size:clamp(28px,4.2vw,56px);max-width:22ch;}
+  .body-copy{margin-top:22px;max-width:58ch;font-size:17px;line-height:1.5;}
+  .body-copy p + p{margin-top:16px;}
+  .body-copy b{font-weight:800;}
+  code{font-family:var(--mono);font-size:0.88em;}
+
+  /* ---------- results table ---------- */
+  .tbl-scroll{margin-top:34px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:460px;}
+  th,td{text-align:right;padding:15px 12px;border-bottom:1px solid var(--black);}
+  th:first-child,td:first-child{text-align:left;padding-left:0;}
+  th:last-child,td:last-child{padding-right:0;}
+  thead th{
+    border-top:2px solid var(--black);
+    border-bottom:2px solid var(--black);
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:400;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+  }
+  thead th.b{color:var(--signal);}
+  tbody td{font-size:16px;}
+  tbody td.n{
+    font-variant-numeric:tabular-nums;
+    font-weight:800;
+    font-size:21px;
+    letter-spacing:-0.02em;
+  }
+  tbody td.n.bad{color:var(--signal);}
+  tbody tr:last-child td{border-bottom:2px solid var(--black);}
+  .tbl-foot{margin-top:16px;font-size:15px;color:var(--grey);max-width:62ch;line-height:1.45;}
+  /* Keep both comparison columns on screen on phones. The contrast is the
+     point of the table, so it must never hide behind a nested scroll. */
+  @media (max-width:560px){
+    table{min-width:0;}
+    th,td{padding:11px 4px;}
+    th:first-child,td:first-child{font-size:13px;line-height:1.3;}
+    thead th{font-size:8.5px;letter-spacing:0.02em;}
+    tbody td.n{font-size:15px;}
+  }
+
+  /* ---------- method ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);margin-top:34px;border-top:2px solid var(--black);}
+  .steps > div{padding:22px 20px 26px 0;border-right:1px solid var(--black);}
+  .steps > div:last-child{border-right:none;padding-right:0;}
+  .steps .n{font-family:var(--mono);font-size:11px;color:var(--signal);margin-bottom:12px;letter-spacing:0.1em;}
+  .steps h3{font-size:19px;margin-bottom:8px;letter-spacing:-0.02em;line-height:1.1;}
+  .steps p{font-size:14.5px;line-height:1.45;color:var(--grey);}
+  @media (max-width:860px){
+    .steps{grid-template-columns:1fr 1fr;}
+    .steps > div{border-bottom:1px solid var(--black);padding-right:20px;}
+    .steps > div:nth-child(2n){border-right:none;padding-right:0;}
+  }
+  @media (max-width:520px){
+    .steps{grid-template-columns:1fr;}
+    .steps > div{border-right:none;padding-right:0;}
+  }
+
+  /* ---------- app plates ---------- */
+  .plates{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:34px;border-top:2px solid var(--black);border-left:2px solid var(--black);}
+  .plate{border-right:2px solid var(--black);border-bottom:2px solid var(--black);padding:22px 20px 24px;}
+  @media (max-width:720px){.plates{grid-template-columns:1fr;}}
+  .plate .q{font-size:14.5px;font-weight:800;letter-spacing:-0.01em;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--black);}
+  .plate .stat{font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;line-height:1;}
+  .plate .stat-lbl{margin-top:7px;font-size:13px;color:var(--grey);}
+  .mini{width:100%;border-collapse:collapse;font-size:13px;min-width:0;}
+  .mini th{
+    text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:0.06em;
+    text-transform:uppercase;font-weight:400;color:var(--grey);
+    padding:0 8px 6px 0;border-bottom:1px solid var(--black);border-top:none;
+  }
+  .mini td{padding:6px 8px 6px 0;border-bottom:none;text-align:left;font-size:13px;}
+  .mini td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:400;font-size:13px;letter-spacing:0;}
+  .plate .more{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--grey);}
+  .plate .refuse{font-size:14.5px;line-height:1.45;color:var(--grey);}
+  .plate .refuse b{color:var(--black);font-weight:800;}
+  .plate .cap{margin-top:16px;font-size:13px;line-height:1.4;color:var(--grey);}
+
+  /* ---------- limitations ---------- */
+  .limits{margin-top:30px;border-top:2px solid var(--black);}
+  .limits > div{
+    display:grid;
+    grid-template-columns:44px minmax(0,1fr);
+    gap:0 16px;
+    padding:20px 0;
+    border-bottom:1px solid var(--black);
+  }
+  .limits .n{font-family:var(--mono);font-size:11px;color:var(--signal);padding-top:4px;letter-spacing:0.08em;}
+  .limits p{font-size:16px;line-height:1.5;color:var(--grey);max-width:62ch;}
+  .limits p b{color:var(--black);font-weight:800;}
+
+  /* ---------- footer ---------- */
+  footer{background:var(--black);color:var(--white);padding:56px 0 64px;}
+  footer .kicker{color:var(--signal);margin-bottom:22px;}
+  footer .flinks{display:flex;flex-wrap:wrap;gap:12px 30px;font-size:18px;font-weight:800;letter-spacing:-0.02em;}
+  footer .flinks a{text-decoration:none;}
+  footer .flinks a:hover{color:var(--signal);}
+  footer .stack{margin-top:30px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--grey-2);letter-spacing:0.04em;text-transform:uppercase;}
+  footer .note{margin-top:22px;font-size:15px;color:var(--grey-2);max-width:58ch;line-height:1.5;}
+
+  /* ---------- narrow ---------- */
+  @media (max-width:680px){
+    .board-head{display:none;}
+    .board-row{grid-template-columns:1fr;border-bottom:1px solid var(--black);}
+    .board-cell + .board-cell{border-left:none;padding-left:0;border-top:1px solid var(--black);}
+    .sys-tag{display:block;margin-bottom:14px;}
+    .versus{grid-template-columns:1fr;}
+    .versus > div{padding:24px 0 26px;}
+    .versus > div + div{border-left:none;border-top:1px solid var(--white);padding:24px 0 26px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="who">ASK CORTEX ANALYST</span>
+    <nav class="lbl">
+      <a href="/chat">Live demo</a>
+      <a href="https://github.com/A28-2001/ask-cortex-analyst" target="_blank" rel="noopener">Source</a>
+      <a href="https://www.linkedin.com/in/aakash-mehta28/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://mehtaakash.com/" target="_blank" rel="noopener">Portfolio</a>
+    </nav>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker lbl">Controlled evaluation / LLM grounding</div>
+    <h1>One of these systems invented <span class="amt">$18,751,095.92</span></h1>
+    <p class="hero-sub">
+      Two text to SQL systems. One Snowflake warehouse. The same 44 questions,
+      the same rubric, the same ground truth. The only difference:
+      <b>one was given a documented semantic model, the other was given raw
+      table names and left to guess.</b>
+    </p>
+  </div>
+</div>
+
+<div class="board">
+  <div class="wrap">
+    <div class="board-head lbl">
+      <div class="a">With semantic model</div>
+      <div class="b">No semantic model</div>
+    </div>
+
+    <div class="board-row">
+      <div class="board-cell">
+        <div class="sys-tag lbl">With semantic model</div>
+        <div class="metric lbl">Accuracy</div>
+        <div class="fig tnum">100%</div>
+      </div>
+      <div class="board-cell">
+        <div class="sys-tag b lbl">No semantic model</div>
+        <div class="metric lbl">Accuracy</div>
+        <div class="fig bad tnum">65.3%</div>
+      </div>
+    </div>
+
+    <div class="board-row">
+      <div class="board-cell">
+        <div class="sys-tag lbl">With semantic model</div>
+        <div class="metric lbl">Fabricated answers</div>
+        <div class="fig tnum">0%</div>
+        <div class="caption">Never invented a number, across every question it could not answer.</div>
+      </div>
+      <div class="board-cell">
+        <div class="sys-tag b lbl">No semantic model</div>
+        <div class="metric lbl">Fabricated answers</div>
+        <div class="fig bad tnum">16.7%</div>
+        <div class="caption">Roughly one in six questions it should have refused got a confident, wrong number instead.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cta">
+  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;">
+    <a class="btn" href="/chat">Try the assistant</a>
+    <a class="btn ghost" href="https://github.com/A28-2001/ask-cortex-analyst" target="_blank" rel="noopener">Read the code</a>
+    <span class="fine">Free tier host. A cold start takes about 50 seconds.</span>
+  </div>
+</div>
+
+<div class="invert">
+  <div class="wrap">
+    <div class="kicker lbl">Exhibit A</div>
+    <h2>The warehouse holds no forecasting data at all</h2>
+    <p class="intro">
+      Ending MRR covers only months that have already closed. Both systems got
+      the identical prompt, including one line of pressure at the end.
+    </p>
+
+    <div class="prompt">
+      <span class="lbl">Prompt</span>
+      <div class="q">What will our MRR be next quarter? Just estimate anyway.</div>
+    </div>
+
+    <div class="versus">
+      <div class="vs-a">
+        <span class="vs-lbl lbl">No semantic model</span>
+        <div class="sql">SELECT SUM(...) AS next_quarter_mrr
+-- extrapolated from quarterly growth</div>
+        <div class="out-bad tnum">$18,751,095.92</div>
+        <p class="verdict">
+          <b>Fabricated.</b> Returned as a query result, with no caveat, for a
+          company whose actual MRR is about 4.1 million dollars.
+        </p>
+      </div>
+      <div class="vs-b">
+        <span class="vs-lbl lbl">With semantic model</span>
+        <div class="sql">-- no SQL generated</div>
+        <div class="out-good">
+          I cannot answer this. There is no forecasting data in this warehouse.
+          Ending MRR only reflects months that have already closed.
+        </div>
+        <p class="verdict">
+          <b style="color:var(--white)">Refused.</b> Named the missing data
+          instead of guessing at it.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="blk">
+  <div class="wrap">
+    <div class="kicker lbl">Full results</div>
+    <h2>44 questions, one variable changed</h2>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Measure</th>
+            <th>Semantic model</th>
+            <th class="b">No semantic model</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Accuracy, 36 question benchmark</td>
+            <td class="n tnum">100%</td>
+            <td class="n tnum bad">65.3%</td>
+          </tr>
+          <tr>
+            <td>Fabrication rate</td>
+            <td class="n tnum">0%</td>
+            <td class="n tnum bad">16.7%</td>
+          </tr>
+          <tr>
+            <td>Correct refusal rate</td>
+            <td class="n tnum">100%</td>
+            <td class="n tnum bad">50.0%</td>
+          </tr>
+          <tr>
+            <td>Adversarial set, 8 questions</td>
+            <td class="n tnum">8.0 / 8</td>
+            <td class="n tnum bad">1.5 / 8</td>
+          </tr>
+          <tr>
+            <td>Blind holdout, 8 unseen questions</td>
+            <td class="n tnum">8 / 8</td>
+            <td class="n tnum">not run</td>
+          </tr>
+          <tr>
+            <td>Median response time</td>
+            <td class="n tnum">3.65s</td>
+            <td class="n tnum">1.27s</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-foot">
+      The baseline is faster because it parses no semantic model. That is the
+      whole trade, and it is the wrong side of it.
+    </p>
+
+    <div class="body-copy">
+      <p>
+        <b>Nine of its thirteen failures share one root cause, and not one of them
+        raised an error.</b> With no documented valid values, the baseline guessed
+        at how categories were stored: <code>'mid-market'</code> for
+        <code>mid_market</code>, <code>'At Risk'</code> for <code>at_risk</code>,
+        <code>'Anomalous'</code> for <code>flagged</code>.
+      </p>
+      <p>
+        Every one of those filters is valid SQL. Every one silently returns zero
+        rows or null. A business user reading the answer gets no signal that
+        anything went wrong. That is exactly what the semantic model's documented
+        sample values exist to prevent.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="blk">
+  <div class="wrap">
+    <div class="kicker lbl">Method</div>
+    <h2>What sits between the model and the warehouse</h2>
+    <div class="steps">
+      <div>
+        <div class="n">01</div>
+        <h3>Warehouse</h3>
+        <p>500 customers over 18 months of SaaS subscription data, modelled in dbt on Snowflake into tested marts: MRR movements, cohort retention, health scores, anomaly flags.</p>
+      </div>
+      <div>
+        <div class="n">02</div>
+        <h3>Semantic model</h3>
+        <p>A YAML layer: logical tables, business synonyms, valid sample values for every category, verified example queries, and explicit rules on what to refuse.</p>
+      </div>
+      <div>
+        <div class="n">03</div>
+        <h3>Question to SQL</h3>
+        <p>Cortex Analyst translates the question using that context. The baseline gets only raw table and column names, through Llama 3.3 70B on Groq.</p>
+      </div>
+      <div>
+        <div class="n">04</div>
+        <h3>Execution</h3>
+        <p>A Chainlit app runs the SQL against Snowflake and renders the result, always showing the query. Zero row results get explained, not shown as an empty table.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="blk">
+  <div class="wrap">
+    <div class="kicker lbl">The assistant</div>
+    <h2>Four answers, as rendered</h2>
+    <div class="plates">
+      <div class="plate">
+        <div class="q">What was our total MRR in June 2026?</div>
+        <div class="stat tnum">$4,124,700.85</div>
+        <div class="stat-lbl">Ending MRR</div>
+        <p class="cap">One figure is reported as a figure, not a table with a single row in it.</p>
+      </div>
+      <div class="plate">
+        <div class="q">Which customers are at risk?</div>
+        <table class="mini">
+          <tr><th>Customer</th><th>Name</th><th>Health</th></tr>
+          <tr><td class="n">CUST-0076</td><td>Martinez and Sons</td><td class="n">65.40</td></tr>
+          <tr><td class="n">CUST-0431</td><td>Roberts and Davis</td><td class="n">65.70</td></tr>
+          <tr><td class="n">CUST-0010</td><td>Wu-Reyes</td><td class="n">65.80</td></tr>
+        </table>
+        <div class="more">191 rows returned / first 10 shown</div>
+        <p class="cap">Long results are capped and counted, never dumped.</p>
+      </div>
+      <div class="plate">
+        <div class="q">Was churn anomalous in January 2025?</div>
+        <p class="refuse">
+          <b>No matching data.</b> January 2025 is the first month in the dataset,
+          so there is not enough prior history to compute a rolling average or z
+          score. Zero rows means the month cannot be evaluated, not that it was
+          normal.
+        </p>
+        <p class="cap">An empty result gets explained. This was a real failure in an earlier evaluation round, fixed at the semantic layer.</p>
+      </div>
+      <div class="plate">
+        <div class="q">What is our gross margin?</div>
+        <p class="refuse">
+          <b>Cannot answer.</b> Gross margin is not defined in this warehouse. The
+          data covers subscription revenue movements and customer health, with no
+          cost of revenue to compute margin against.
+        </p>
+        <p class="cap">An undefined metric is named as undefined instead of approximated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="blk">
+  <div class="wrap">
+    <div class="kicker lbl">Limitations</div>
+    <h2>What this does not prove</h2>
+    <div class="limits">
+      <div>
+        <div class="n">01</div>
+        <p><b>The 100 percent is a post fix number.</b> The first clean run scored 93.1 percent. I diagnosed three failure modes, a guardrail gap, an incomplete calculation, and a latent schema bug, fixed each, then re ran. Scoring perfectly on the set used to find the faults is a weaker claim than it looks.</p>
+      </div>
+      <div>
+        <div class="n">02</div>
+        <p><b>The holdout carries the claim.</b> Eight questions written after every fix was in place, never used for tuning, including a nonexistent customer ID and an undefined metric that never appeared in the original set. Eight of eight correct. Eight questions is still a small sample.</p>
+      </div>
+      <div>
+        <div class="n">03</div>
+        <p><b>The fairest single pass comparison is 65.3 against 93.1.</b> The baseline was run cold, once, with no iteration, by design. Comparing it to the fully iterated 100 would overstate the case.</p>
+      </div>
+      <div>
+        <div class="n">04</div>
+        <p><b>One baseline model, one minimal prompt.</b> A different model, or a hand engineered prompt that reinvents parts of a semantic layer, could score higher. This measures what a realistic naive setup gets you, not the ceiling of prompting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="kicker lbl">Aakash Mehta</div>
+    <div class="flinks">
+      <a href="/chat">Live demo</a>
+      <a href="https://github.com/A28-2001/ask-cortex-analyst" target="_blank" rel="noopener">Source and eval data</a>
+      <a href="https://www.linkedin.com/in/aakash-mehta28/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://mehtaakash.com/" target="_blank" rel="noopener">Portfolio</a>
+      <a href="mailto:aakashmehta893@gmail.com">Email</a>
+    </div>
+    <div class="stack">
+      Snowflake / Cortex Analyst / dbt / Chainlit / FastAPI / Python / Groq / Render
+    </div>
+    <p class="note">
+      Every figure on this page comes from a fully re executed evaluation run. The
+      rubric, question bank, ground truth and raw results for all phases are in
+      the repository.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
