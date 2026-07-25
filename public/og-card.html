@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>OG card</title>
+<link rel="stylesheet" href="/static/fonts/fonts.css" />
+<style>
+  :root{
+    --paper:#DCE2E7;
+    --ink:#14181B;
+    --ink-soft:#4C575E;
+    --blue:#2438E0;
+    --red:#EE2B3B;
+    --yellow:#FFE14D;
+    --grid:rgba(20,24,27,0.075);
+    --sans:'Bricolage Grotesque', -apple-system, Helvetica, Arial, sans-serif;
+    --hand:'Caveat', cursive;
+    --mono:ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    width:1200px;height:630px;overflow:hidden;
+    font-family:var(--sans);color:var(--ink);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 26px);
+    position:relative;
+  }
+  body::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    opacity:0.34;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+  .pad{position:relative;z-index:2;padding:52px 58px;height:100%;display:flex;flex-direction:column;}
+  .top{display:flex;justify-content:space-between;align-items:baseline;}
+  .sig{font-family:var(--hand);font-weight:700;font-size:31px;transform:rotate(-1.5deg);}
+  .tag{font-family:var(--mono);font-size:14px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-soft);}
+
+  .mid{margin-top:34px;}
+  .kicker{font-size:41px;font-weight:600;letter-spacing:-0.02em;}
+  .numwrap{position:relative;display:inline-block;margin-top:4px;}
+  .num{font-size:92px;font-weight:800;letter-spacing:-0.045em;color:var(--red);
+       font-variant-numeric:tabular-nums;line-height:1.08;white-space:nowrap;}
+  .numwrap svg{position:absolute;left:-3%;top:-4%;width:106%;height:110%;overflow:visible;}
+  .numwrap svg path{fill:none;stroke:var(--red);stroke-width:4;stroke-linecap:round;}
+  .scrawl{margin-top:16px;font-family:var(--hand);font-weight:700;font-size:31px;
+          color:var(--blue);line-height:1.15;transform:rotate(-0.8deg);}
+  .scrawl .r{color:var(--red);}
+
+  .tally{margin-top:auto;display:flex;gap:60px;border-top:3px solid var(--ink);padding-top:20px;}
+  .cell .lab{font-family:var(--mono);font-size:13px;letter-spacing:0.1em;
+             text-transform:uppercase;color:var(--ink-soft);}
+  .cell .pair{display:flex;align-items:baseline;gap:14px;margin-top:4px;}
+  .v{font-size:54px;font-weight:800;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;line-height:1;}
+  .v.bad{color:var(--red);}
+  .vs{font-family:var(--hand);font-weight:700;font-size:26px;color:var(--ink-soft);}
+  .hl{background:linear-gradient(transparent 56%, var(--yellow) 56% 96%, transparent 96%);padding:0 4px;}
+  .url{margin-left:auto;align-self:flex-end;font-family:var(--mono);font-size:15px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+  <div class="pad">
+    <div class="top">
+      <span class="sig">Aakash Mehta</span>
+      <span class="tag">A controlled test of LLM grounding</span>
+    </div>
+
+    <div class="mid">
+      <div class="kicker">I asked two systems the same 44 questions.<br />One of them made up</div>
+      <span class="numwrap">
+        <span class="num">$18,751,095.92</span>
+        <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+          <path d="M22,52 C24,20 118,8 214,10 C318,12 388,26 386,52 C384,80 288,94 190,92 C92,90 20,80 22,52 C23,38 40,28 62,22" />
+        </svg>
+      </span>
+      <div class="scrawl">there is no forecasting data in this warehouse. <span class="r">none.</span></div>
+    </div>
+
+    <div class="tally">
+      <div class="cell">
+        <div class="lab">Accuracy</div>
+        <div class="pair"><span class="v"><span class="hl">100%</span></span><span class="vs">vs</span><span class="v bad">65.3%</span></div>
+      </div>
+      <div class="cell">
+        <div class="lab">Made up an answer</div>
+        <div class="pair"><span class="v"><span class="hl">0%</span></span><span class="vs">vs</span><span class="v bad">16.7%</span></div>
+      </div>
+      <div class="url">ask-cortex-analyst.onrender.com</div>
+    </div>
+  </div>
+</body>
+</html>

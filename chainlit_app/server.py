@@ -1,7 +1,7 @@
 import os
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from chainlit.utils import mount_chainlit
@@ -9,8 +9,7 @@ from chainlit.utils import mount_chainlit
 app = FastAPI()
 
 PUBLIC_DIR = os.path.join(os.path.dirname(__file__), "..", "public")
-LANDING_PATH = os.path.join(os.path.dirname(__file__), "landing.html")
-LANDING_V2_PATH = os.path.join(os.path.dirname(__file__), "landing_zine.html")
+LANDING_PATH = os.path.join(os.path.dirname(__file__), "landing_zine.html")
 OG_IMAGE_PATH = os.path.join(PUBLIC_DIR, "og-image.png")
 
 # Self-hosted fonts and the real app screenshots used by the landing page.
@@ -23,9 +22,10 @@ async def landing():
 
 
 @app.get("/v2")
-async def landing_v2():
-    # Candidate redesign, served alongside the current page for comparison.
-    return FileResponse(LANDING_V2_PATH)
+async def landing_v2_redirect():
+    # /v2 was the temporary comparison route while the design was in review.
+    # Anyone who saved that link lands on the real page instead of a 404.
+    return RedirectResponse("/", status_code=301)
 
 
 @app.get("/og-image.png")
