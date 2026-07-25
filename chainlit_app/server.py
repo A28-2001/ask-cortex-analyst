@@ -2,14 +2,19 @@ import os
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from chainlit.utils import mount_chainlit
 
 app = FastAPI()
 
+PUBLIC_DIR = os.path.join(os.path.dirname(__file__), "..", "public")
 LANDING_PATH = os.path.join(os.path.dirname(__file__), "landing.html")
-LANDING_V2_PATH = os.path.join(os.path.dirname(__file__), "landing_v2.html")
-OG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "..", "public", "og-image.png")
+LANDING_V2_PATH = os.path.join(os.path.dirname(__file__), "landing_zine.html")
+OG_IMAGE_PATH = os.path.join(PUBLIC_DIR, "og-image.png")
+
+# Self-hosted fonts and the real app screenshots used by the landing page.
+app.mount("/static", StaticFiles(directory=PUBLIC_DIR), name="static")
 
 
 @app.get("/")
