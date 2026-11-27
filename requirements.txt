@@ -16,3 +16,4 @@ pillow==12.3.0
 matplotlib==3.10.0
 pytest==9.1.1
 playwright==1.61.0
+sqlglot==30.35.0
