@@ -8,8 +8,8 @@ def load_private_key():
     """Load the Snowflake RSA private key.
 
     Local dev: SNOWFLAKE_PRIVATE_KEY_PATH points at a .p8 file on disk.
-    Deployed (e.g. Hugging Face Spaces): SNOWFLAKE_PRIVATE_KEY holds the
-    raw PEM content directly as a secret env var -- no file on disk needed.
+    Deployed (Render): SNOWFLAKE_PRIVATE_KEY holds the raw PEM content as a
+    secret environment variable, so no key file is needed on disk.
     """
     pem_content = os.environ.get("SNOWFLAKE_PRIVATE_KEY")
     if pem_content:

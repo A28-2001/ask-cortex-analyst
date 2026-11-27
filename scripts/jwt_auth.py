@@ -8,9 +8,9 @@ from cryptography.hazmat.primitives import serialization
 from snowflake_auth import load_private_key
 
 # Keyed by (account, user); each entry is (token, expiry_datetime). A JWT is
-# valid for lifetime_minutes -- regenerating (and re-signing with RSA) on
-# every single chat message is pure wasted latency, so reuse the token until
-# it's close to expiry.
+# valid for lifetime_minutes, and regenerating (and re-signing with RSA) on
+# every chat message is wasted latency, so the token is reused until it's
+# close to expiry.
 _jwt_cache: dict = {}
 _REFRESH_MARGIN = timedelta(minutes=5)
 
@@ -28,7 +28,7 @@ def prepare_account_name_for_jwt(raw_account: str) -> str:
     return account.upper()
 
 
-def generate_jwt(account: str, user: str, private_key_path: str = None, lifetime_minutes: int = 59) -> str:
+def generate_jwt(account: str, user: str, lifetime_minutes: int = 59) -> str:
     cache_key = (account, user)
     now = datetime.now(timezone.utc)
     cached = _jwt_cache.get(cache_key)
