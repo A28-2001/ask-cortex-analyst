@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(__file__))
 from ask_cortex_analyst import ask, CortexAnalystError
+from eval_io import save_results
 
 load_dotenv()
 
@@ -114,8 +115,7 @@ def main():
         print(f"    -> {verdict['verdict']} ({latency:.2f}s)")
         time.sleep(0.5)  # light rate-limit courtesy
 
-    with open(RESULTS_PATH, "w") as f:
-        yaml.dump({"results": results}, f, sort_keys=False, width=100, allow_unicode=True)
+    save_results(RESULTS_PATH, results)
 
     needs_review = [r for r in results if r["verdict"] == "needs_review"]
     print(f"\nWrote {len(results)} results to {RESULTS_PATH}")

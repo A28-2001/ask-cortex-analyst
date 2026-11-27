@@ -1,30 +1,25 @@
 import os
+
 import sys
+
 import time
+
 import yaml
+
 import snowflake.connector
+
 from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(__file__))
+
 from ask_cortex_analyst import ask, CortexAnalystError
+
+from eval_io import save_results
 
 load_dotenv()
 
 RESULTS_PATH = os.path.join(os.path.dirname(__file__), "..", "eval", "holdout_results.yaml")
 
-conn = snowflake.connector.connect(
-    account=os.environ["SNOWFLAKE_ACCOUNT"],
-    user=os.environ["SNOWFLAKE_USER"],
-    private_key_file=os.environ["SNOWFLAKE_PRIVATE_KEY_PATH"],
-    role=os.environ["SNOWFLAKE_ROLE"],
-    warehouse=os.environ["SNOWFLAKE_WAREHOUSE"],
-    database=os.environ["SNOWFLAKE_DATABASE"],
-    schema=os.environ["SNOWFLAKE_SCHEMA"],
-)
-
-# Fresh questions, never used to test or tune the semantic model.
-# H7/H8 deliberately probe generalization of the two behavioral fixes with
-# DIFFERENT literal values than the ones used to diagnose/fix them.
 ANSWERABLE = [
     dict(id="h1", category="point_in_time", question="What was our ending MRR in August 2025?",
          sql="SELECT ending_mrr FROM mrr_movements WHERE month = '2025-08-01'"),
@@ -50,7 +45,6 @@ GUARDRAIL = [
          expected_reason="No cost-of-goods-sold or margin data exists in this dataset -- a completely new undefined-metric case, not one of the original 6 guardrail questions."),
 ]
 
-
 def fetch_ground_truth(sql):
     cur = conn.cursor()
     cur.execute(sql)
@@ -60,7 +54,6 @@ def fetch_ground_truth(sql):
         return str(rows[0][0])
     return str(rows)
 
-
 def extract_blocks(result):
     sql_stmt, text = None, None
     for block in result.get("message", {}).get("content", []):
@@ -69,7 +62,6 @@ def extract_blocks(result):
         elif block["type"] == "text":
             text = block["text"]
     return sql_stmt, text
-
 
 def execute_sql(sql):
     cur = conn.cursor()
@@ -81,44 +73,53 @@ def execute_sql(sql):
     finally:
         cur.close()
 
-
 results = []
 
-for q in ANSWERABLE:
-    truth = fetch_ground_truth(q["sql"])
-    print(f"[{q['id']}] {q['question']}\n    ground truth: {truth}")
-    try:
-        resp, _, latency = ask(q["question"])
-    except CortexAnalystError as e:
-        results.append({**q, "type": "answerable", "ground_truth_value": truth, "error": str(e), "score": 0.0, "verdict": "api_error"})
-        continue
-    sql_stmt, text = extract_blocks(resp)
-    exec_result = execute_sql(sql_stmt) if sql_stmt else {"rows": None, "error": None}
-    print(f"    generated_sql: {'yes' if sql_stmt else 'NO SQL (refused)'}")
-    print(f"    actual_rows: {exec_result['rows']}")
-    results.append({
-        **q, "type": "answerable", "ground_truth_value": truth,
-        "generated_sql": sql_stmt, "cortex_text": text,
-        "actual_rows": exec_result["rows"], "exec_error": exec_result["error"],
-        "latency": round(latency, 2),
-    })
-    time.sleep(0.5)
 
-for q in GUARDRAIL:
-    print(f"[{q['id']}] {q['question']}")
-    try:
-        resp, _, latency = ask(q["question"])
-    except CortexAnalystError as e:
-        results.append({**q, "type": "guardrail", "error": str(e), "score": 0.0, "verdict": "api_error"})
-        continue
-    sql_stmt, text = extract_blocks(resp)
-    print(f"    generated_sql: {'yes' if sql_stmt else 'NO SQL (refused)'}")
-    print(f"    text: {text}")
-    results.append({**q, "type": "guardrail", "generated_sql": sql_stmt, "cortex_text": text, "latency": round(latency, 2)})
-    time.sleep(0.5)
+if __name__ == "__main__":
+    conn = snowflake.connector.connect(
+        account=os.environ["SNOWFLAKE_ACCOUNT"],
+        user=os.environ["SNOWFLAKE_USER"],
+        private_key_file=os.environ["SNOWFLAKE_PRIVATE_KEY_PATH"],
+        role=os.environ["SNOWFLAKE_ROLE"],
+        warehouse=os.environ["SNOWFLAKE_WAREHOUSE"],
+        database=os.environ["SNOWFLAKE_DATABASE"],
+        schema=os.environ["SNOWFLAKE_SCHEMA"],
+    )
 
-with open(RESULTS_PATH, "w") as f:
-    yaml.dump({"results": results}, f, sort_keys=False, width=100, allow_unicode=True)
+    for q in ANSWERABLE:
+        truth = fetch_ground_truth(q["sql"])
+        print(f"[{q['id']}] {q['question']}\n    ground truth: {truth}")
+        try:
+            resp, _, latency = ask(q["question"])
+        except CortexAnalystError as e:
+            results.append({**q, "type": "answerable", "ground_truth_value": truth, "error": str(e), "score": 0.0, "verdict": "api_error"})
+            continue
+        sql_stmt, text = extract_blocks(resp)
+        exec_result = execute_sql(sql_stmt) if sql_stmt else {"rows": None, "error": None}
+        print(f"    generated_sql: {'yes' if sql_stmt else 'NO SQL (refused)'}")
+        print(f"    actual_rows: {exec_result['rows']}")
+        results.append({
+            **q, "type": "answerable", "ground_truth_value": truth,
+            "generated_sql": sql_stmt, "cortex_text": text,
+            "actual_rows": exec_result["rows"], "exec_error": exec_result["error"],
+            "latency": round(latency, 2),
+        })
+        time.sleep(0.5)
 
-print(f"\nWrote raw holdout results to {RESULTS_PATH}")
-conn.close()
+    for q in GUARDRAIL:
+        print(f"[{q['id']}] {q['question']}")
+        try:
+            resp, _, latency = ask(q["question"])
+        except CortexAnalystError as e:
+            results.append({**q, "type": "guardrail", "error": str(e), "score": 0.0, "verdict": "api_error"})
+            continue
+        sql_stmt, text = extract_blocks(resp)
+        print(f"    generated_sql: {'yes' if sql_stmt else 'NO SQL (refused)'}")
+        print(f"    text: {text}")
+        results.append({**q, "type": "guardrail", "generated_sql": sql_stmt, "cortex_text": text, "latency": round(latency, 2)})
+        time.sleep(0.5)
+
+    save_results(RESULTS_PATH, results)
+
+    conn.close()

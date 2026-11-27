@@ -6,6 +6,7 @@ import snowflake.connector
 from groq import Groq
 from dotenv import load_dotenv
 from schema_only import RAW_SCHEMA
+from eval_io import save_results
 
 load_dotenv()
 
@@ -91,9 +92,7 @@ def main():
         print(f"    -> {status} ({latency:.2f}s)")
         time.sleep(0.3)
 
-    with open(RESULTS_PATH, "w") as f:
-        yaml.dump({"results": results}, f, sort_keys=False, width=100, allow_unicode=True)
-    print(f"\nWrote {len(results)} raw baseline results to {RESULTS_PATH}")
+    save_results(RESULTS_PATH, results)
     conn.close()
 
 
