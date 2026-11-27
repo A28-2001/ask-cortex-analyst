@@ -7,6 +7,11 @@ dbt_project/dbt_packages/
 dbt_project/logs/
 dbt_project/.user.yml
 .DS_Store
-.chainlit/translations/
+.chainlit/translations/*
+# The one translation that is customized (input placeholder, header label)
+!.chainlit/translations/en-US.json
 .chainlit/.files/
 .files/
+
+# Eval runs that hit an infrastructure failure (see scripts/eval_io.py)
+eval/*.failed-*.yaml

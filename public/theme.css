@@ -1,34 +1,141 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+/* The chat, dressed to match the landing page: graph paper, ink, one blue,
+   Bricolage Grotesque for print and Caveat for handwriting. Colours come from
+   public/theme.json (Chainlit's own theming), so this file only shapes things
+   and needs no !important on the palette. */
 
-:root {
-  --primary: 173 80% 40% !important;
-  --primary-foreground: 0 0% 100% !important;
-  --font-sans: 'Plus Jakarta Sans', sans-serif !important;
+@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:400 800;font-display:swap;src:url('/static/fonts/bricolage-var.woff2') format('woff2');}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('/static/fonts/caveat-700.woff2') format('woff2');}
+
+:root{
+  --ink-hex:#14181B;
+  --paper-grid:rgba(20,24,27,0.07);
+  --yellow:#FFE14D;
+  --hand:'Caveat','Bradley Hand',cursive;
+}
+.dark{
+  --ink-hex:#E7EBEF;
+  --paper-grid:rgba(231,235,239,0.045);
 }
 
-.dark {
-  --primary: 173 70% 45% !important;
-  --primary-foreground: 0 0% 100% !important;
-  --font-sans: 'Plus Jakarta Sans', sans-serif !important;
+body{
+  background-color:hsl(var(--background));
+  background-image:
+    repeating-linear-gradient(to right, var(--paper-grid) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(to bottom, var(--paper-grid) 0 1px, transparent 1px 26px);
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--yellow);color:#14181B;}
+
+/* ---------- before the app has loaded ---------- */
+#root:empty::before{
+  content:"waking the analyst up\2026";
+  position:fixed;inset:0;display:grid;place-items:center;
+  font-family:var(--hand);font-weight:700;font-size:28px;color:#2438E0;
 }
 
-/* Logo + wordmark lockup on the empty-chat welcome screen (see custom.js,
-   which inserts the .brand-lockup wrapper and .brand-lockup-text label). */
-.welcome-screen .logo {
-  width: 64px !important;
-  height: 64px !important;
-  margin-bottom: 0 !important;
+/* ---------- header ---------- */
+#header a{
+  font-size:14px;color:hsl(var(--muted-foreground));text-decoration:none;
+  padding:6px 8px;border-radius:2px;
+}
+#header a:hover{background:var(--yellow);color:#14181B;}
+#header a img{width:18px;height:18px;}
+.dark #header a img{filter:invert(1);}
+@media (max-width:640px){
+  /* icons only, so the header fits a phone */
+  #header a span{display:none;}
+  #header a{padding:6px;}
 }
 
-.brand-lockup {
-  display: flex;
-  flex-direction: row !important;
-  align-items: center;
-  gap: 16px;
+/* ---------- welcome screen ---------- */
+.welcome-screen .logo{
+  width:60px !important;height:60px !important;margin-bottom:0 !important;
+  border:2px solid var(--ink-hex);box-shadow:4px 4px 0 var(--ink-hex);
+}
+.brand-lockup{display:flex;flex-direction:row !important;align-items:center;gap:18px;}
+.brand-lockup-text{
+  font-size:clamp(28px,5vw,38px);font-weight:800;letter-spacing:-0.035em;line-height:1;
+  color:hsl(var(--foreground));
+}
+.brand-sub{
+  margin-top:-2px;text-align:center;max-width:34ch;
+  font-family:var(--hand);font-weight:700;font-size:23px;line-height:1.15;
+  color:hsl(var(--primary));transform:rotate(-1deg);
 }
 
-.brand-lockup-text {
-  font-size: 28px;
-  font-weight: 600;
-  color: hsl(var(--foreground));
+/* ---------- composer: a taped-down card, like the landing page ---------- */
+#message-composer{
+  background:hsl(var(--card));
+  border:2px solid var(--ink-hex);
+  border-radius:0;
+  box-shadow:5px 5px 0 var(--ink-hex);
 }
+#chat-input{font-size:17px;}
+#chat-submit{border-radius:0;}
+
+/* ---------- starters ---------- */
+#starters button{
+  border:2px solid var(--ink-hex);border-radius:0;
+  background:hsl(var(--card));color:hsl(var(--foreground));
+  font-weight:600;box-shadow:3px 3px 0 var(--ink-hex);
+  transition:transform .12s, box-shadow .12s, background .12s;
+  white-space:normal;height:auto;min-height:40px;max-width:calc(100vw - 40px);text-align:center;line-height:1.25;
+}
+#starters button:hover{background:var(--yellow);color:#14181B;transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink-hex);}
+#starters button[data-state="on"],#starters button.bg-primary,#starters button[aria-pressed="true"]{
+  background:hsl(var(--primary));color:hsl(var(--primary-foreground));
+}
+
+/* ---------- messages ---------- */
+/* The visitor's question, in blue handwriting, the way the landing page annotates */
+[data-step-type="user_message"] .bg-accent{
+  background:transparent;border-radius:0;padding:2px 4px;
+}
+[data-step-type="user_message"] [role="article"]{
+  font-family:var(--hand);font-weight:700;font-size:25px;line-height:1.2;
+  color:hsl(var(--primary));
+}
+
+/* "Recorded answer" note: the yellow sticky from the landing page */
+.ai-message blockquote{
+  font-style:normal;margin-top:4px;
+  background:var(--yellow);color:#14181B;
+  border:2px solid #14181B;border-left-width:2px;
+  box-shadow:4px 4px 0 #14181B;
+  padding:10px 14px;font-size:15px;line-height:1.45;
+}
+.ai-message blockquote [role="article"]{line-height:1.45;}
+
+/* Headline stat: one number, printed big */
+.ai-message h2{
+  font-size:clamp(38px,6vw,56px);font-weight:800;letter-spacing:-0.04em;line-height:1;
+  font-variant-numeric:tabular-nums;border:0;padding:0;margin:10px 0 2px;
+}
+.ai-message h2 + [role="article"] .italic{
+  font-style:normal;font-family:var(--font-mono);font-size:12px;
+  letter-spacing:0.08em;text-transform:uppercase;color:hsl(var(--muted-foreground));
+}
+
+/* Tables: ink frame, offset shadow, numbers that line up */
+.ai-message .rounded-lg.border.bg-card{
+  border:2px solid var(--ink-hex);border-radius:0;box-shadow:5px 5px 0 var(--ink-hex);
+}
+.ai-message table{font-variant-numeric:tabular-nums;}
+.ai-message th{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:0.07em;text-transform:uppercase;
+  white-space:nowrap;
+}
+.ai-message td{white-space:nowrap;}
+.ai-message td, .ai-message th{padding:9px 14px;height:auto;}
+
+/* Follow-up questions read as links, not buttons */
+[data-step-type="assistant_message"] button[id]{
+  color:hsl(var(--foreground));background:transparent;border-radius:0;
+  height:auto;padding:3px 2px;margin:2px 8px 2px 0;
+  border-bottom:2px solid hsl(var(--primary));
+  white-space:normal;text-align:left;
+}
+[data-step-type="assistant_message"] button[id]:hover{background:var(--yellow);color:#14181B;}
+
+/* Code: the SQL behind every answer */
+.ai-message pre, .ai-message code{font-family:var(--font-mono);}
